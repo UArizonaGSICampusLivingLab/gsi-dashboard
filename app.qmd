@@ -1,0 +1,75 @@
+---
+title: "Penguins dashboard"
+format: dashboard
+server: shiny
+---
+
+```{r}
+#| context: setup
+library(shiny)
+library(bslib)
+
+library(ggplot2)
+data(penguins, package = "palmerpenguins")
+```
+
+#  {.sidebar}
+
+#### Histogram Controls
+
+------------------------------------------------------------------------
+
+```{r}
+varSelectInput(
+  "var", "Select variable",
+  dplyr::select_if(penguins, is.numeric)
+)
+numericInput("bins", "Number of bins", 30)
+```
+
+# Plots
+
+## Row 1 {height="60%"}
+
+```{r}
+card(
+  card_header("Histogram"),
+  plotOutput("hist")
+)
+```
+
+## Row 2 {height="40%"}
+
+```{r}
+card(
+  card_header("Scatter"),
+  plotOutput("scatter")
+)
+```
+
+# About
+
+There's just plain text on this tab!
+I can use regular markdown formatting like **bold**, *italics*, `code`,
+
+-   item 1
+-   item 2
+
+etc.
+
+
+```{r}
+#| context: server
+
+output$hist <- renderPlot({
+  ggplot(penguins) +
+    geom_histogram(aes(!!input$var), bins = input$bins) +
+    theme_bw(base_size = 20)
+})
+
+output$scatter <- renderPlot({
+  ggplot(penguins) +
+    geom_point(aes(x = body_mass_g, y = !!input$var)) +
+    theme_bw(base_size = 20)
+})
+```
