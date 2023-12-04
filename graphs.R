@@ -1,25 +1,18 @@
 library(tidyverse)
-
+#read in data
 metadata <- read.csv("metadata.csv")
 data <- read.csv("gsi_living_lab_data.csv")|>
   mutate(datetime = ymd_hms(datetime))
-
+#merge metadata and data
 fulldata <- merge(metadata, data, by = c("device_sn", "sensor"))
 
-#select a site 
-  #  select time frame to see
-   #   select a single sensor 
-# select variables to see plotted inside the geomline function 
+#filter data
 input_site <- "Old Main"
 input_mindate <- as.Date("2023-9-01")
 input_maxdate <- as.Date("2023-10-31 00:00:00")
-
-
 sitetimedata <- fulldata |>
   filter(site == input_site) |>
   filter(datetime >= input_mindate & datetime <= input_maxdate)
-
-
 
 
 soil_data <- sitetimedata |> 
@@ -99,3 +92,26 @@ ggplotly(soil_temp_by_depth)
 
 # maybe we don't want to display the things like this I am unsure 
 
+
+fulldata <- fulldata |>
+  mutate(month = month(datetime, label = TRUE))
+
+input_mindate <- as.Date("2023-9-01")
+input_maxdate <- as.Date("2023-10-31 00:00:00")
+# assign defaults to the function inputs with input_mindate = "YYYY-MM-DD" etc! yay
+plot_monthly <- function(input_mindate, input_maxdate){
+  
+
+data_filtered <- fulldata |>
+  filter(datetime >= as.Date(input_mindate) & datetime <= as.Date(input_maxdate))
+
+ggplot(data = data_filtered, aes(x = month, y = air_temperature.value, color = site))+
+         stat_summary(fun.data = mean_sdl, position = position_dodge(width = .7)) 
+}
+
+ggplot(data = data_filtered, aes(x = month, y = air_temperature.value, fill = site))+
+    geom_boxplot()
+
+
+
+#assign a plot to an object, then use patchwork package to align the figures and make a cool comparison. 
