@@ -36,17 +36,35 @@ ui <- page_sidebar(
     )
 
   ),
-  card(
+  layout_columns(
+    height = "20%",
+    value_box(
+      title = "Mean Air Temp.",
+      value = "20 ºC",
+      showcase = bs_icon("thermometer")
+    ),
+    value_box(
+      title = "Mean Soil Temp.",
+      value = "20 ºC",
+      showcase = bs_icon("thermometer")
+    ),
+    value_box(
+      title = "Total Precip.",
+      value = "0 mm",
+      showcase = bs_icon("cloud-rain")
+    ),
+  ),
+  card(height = "27%",
     full_screen = TRUE,
     card_header("Soil Moisture"),
     card_body("plot goes here")
   ),
-  card(
+  card(height = "27%",
     full_screen = TRUE,
     card_header("Precipitation"),
     card_body("plot goes here")
   ),
-  card(
+  card(height = "27%",
     full_screen = TRUE,
     card_header("Soil Temperature"),
     card_body("plot goes here")
@@ -54,7 +72,7 @@ ui <- page_sidebar(
 )
 
 server <- function(input, output, session) {
-  
+
 }
 
 shinyApp(ui, server)
