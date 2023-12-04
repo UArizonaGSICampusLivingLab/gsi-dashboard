@@ -1,62 +1,88 @@
 library(shiny)
-library(zentracloud)
-library(fs)
+library(bslib)
+library(bsicons)
+library(shinyWidgets)
 
-# Shiny app to experiment with caching zentracloud downloads
-# Published app: https://viz.datascience.arizona.edu/content/ece90348-8047-4f48-8f5f-ebea938c98ee/
-# Unfortunately, even caching data separately for each session, the app gets held up when two requests are made at the same time by two different people (or two browser windows).  The second request waits until the first request is finished before starting.  This is because the two sessions are running off of the same server. This might not be a big deal if the requests are quick, but since they are currently taking *at least* 60 seconds, that means if you request data right after someone else did, then your wait is at least 2 minutes!!
-# It might actually be useful to go back to a shared persistent cache among all sessions.  The *actual* problem might be that sessions are locked when another session requests data.
+library(tidyverse)
 
-shinyApp(
-  ui = fluidPage(
-    p("currently cached files"),
-    verbatimTextOutput("cache_files"),
-    verbatimTextOutput("data"),
-    tags$hr(),
-    p("the first time you click this, it'll take ~60sec to get the data.  Subsequent button pushes should be nearly instantaneous"),
-    actionButton("go", "Get Data")
-  ),
-  server = function(input, output, session) {
-    
-    ## hard-coding the cache dir like this works if only one person at a time uses
-    ## the app.  When two people try to use it and request data at the same time,
-    ## it makes one of the instances of the app unresponsive while the other
-    ## finishes updating the data.
-    # cache_dir <- "cache_dir"
-    
-    # Instead, each session gets its own separate cache using the unique session token
-    cache_dir <- fs::path("cache", session$token)
-    
-    setZentracloudOptions(
-      token = Sys.getenv("ZENTRACLOUD_TOKEN"),
-      domain = "default",
-      cache_dir = cache_dir
+metadata <- read.csv("metadata.csv")
+data <- read.csv("gsi_living_lab_data.csv")|>
+  mutate(datetime = ymd_hms(datetime))
+
+fulldata <- merge(metadata, data, by = c("device_sn", "sensor"))
+
+ui <- page_navbar(
+  title = "GSI Living Lab",
+  # fillable = FALSE, # make scrollable.  Try with and without this
+  sidebar = sidebar(
+    value_box(
+      title = "Data Last Updated",
+      value = Sys.Date(),
+      showcase = bs_icon("calendar")
+    ),
+    selectInput(
+      inputId = "site",
+      label = "Site",
+      choices = unique(fulldata$site)
+    ),
+    airDatepickerInput(
+      inputId = "daterange",
+      label = "Date Range",
+      range = TRUE,
+      value = c(Sys.Date() - 7, Sys.Date()),
+      dateFormat = "MM/dd/yy",
+      maxDate = Sys.Date(),
+      addon = "none"
     )
     
+  ),
+  nav_panel(
+    "Timeseries",
     
-    output$cache_files <- renderPrint({
-      input$go
-      if (fs::dir_exists(cache_dir)) {
-        fs::dir_ls(cache_dir, recurse = TRUE, fail = FALSE)
-      } else {
-        cat("Cache will be created at ", cache_dir)
-      }
-    })
-    # Show str(data)
-    # (update with current response when Submit is clicked)
-    output$data <- renderPrint({
-      req(input$go)
-      readings <- getReadings(
-        device_sn = "z6-19484",
-        start_time = "2023-8-01 00:00:00",
-        end_time = "2023-8-01 12:00:00"
-      )
-      str(readings)
-    })     
-    
-    session$onSessionEnded(function() {
-      cat("Clearing cache")
-      fs::dir_delete(fs::path(cache_dir))
-    })
-  }
+    layout_columns(
+      height = "20%",
+      value_box(
+        title = "Mean Air Temp.",
+        value = "20 ºC",
+        showcase = bs_icon("thermometer")
+      ),
+      value_box(
+        title = "Mean Soil Temp.",
+        value = "20 ºC",
+        showcase = bs_icon("thermometer")
+      ),
+      value_box(
+        title = "Total Precip.",
+        value = "0 mm",
+        showcase = bs_icon("cloud-rain")
+      ),
+    ),
+    card(height = "27%",
+         full_screen = TRUE,
+         card_header("Soil Moisture"),
+         card_body("plot goes here")
+    ),
+    card(height = "27%",
+         full_screen = TRUE,
+         card_header("Precipitation"),
+         card_body("plot goes here")
+    ),
+    card(height = "27%",
+         full_screen = TRUE,
+         card_header("Soil Temperature"),
+         card_body("plot goes here")
+    )
+  ),
+  nav_panel(
+    "Monthly Summary"
+  ),
+  nav_panel(
+    "Explore"
+  )
 )
+
+server <- function(input, output, session) {
+  
+}
+
+shinyApp(ui, server)
