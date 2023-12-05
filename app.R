@@ -51,13 +51,19 @@ ui <- page_navbar(
   nav_panel(
     "Atmospheric",
     card(
-      card_header("Air Temperature")
+      full_screen = TRUE,
+      # card_header("Air Temperature"),
+      plotOutput("plot_airtemp")
     ),
     card(
-      card_header("Precipitation")
+      full_screen = TRUE,
+      # card_header("Precipitation"),
+      plotOutput("plot_precip")
     ),
     card(
-      card_header("Vapor Pressure and VPD")
+      full_screen = TRUE,
+      # card_header("Vapor Pressure and VPD"),
+      plotOutput("plot_vp")
     )
   ),
   nav_panel(
@@ -104,6 +110,20 @@ server <- function(input, output, session) {
       filter(datetime >= input$daterange[1], datetime <= input$daterange[2])
   })
   
+  ## Plots --------
+  output$plot_vp <- renderPlot({
+    gsi_plot_vpd(data_filtered())
+  })
+  
+  output$plot_airtemp <- renderPlot({
+    gsi_plot_airtemp(data_filtered())
+  })
+  
+  output$plot_precip <- renderPlot({
+    gsi_plot_precip(data_filtered())
+  })
+  
+  ##  Value boxes -------
   output$stat_airtemp <- renderUI({
     airtemp <- data_filtered()$air_temperature.value
     
