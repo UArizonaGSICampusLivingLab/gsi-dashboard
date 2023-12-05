@@ -52,6 +52,7 @@ ui <- page_navbar(
     "Atmospheric",
     card(
       full_screen = TRUE,
+      # I commented out the headers because i felt like they took up too much space.
       # card_header("Air Temperature"),
       plotOutput("plot_airtemp")
     ),
