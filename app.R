@@ -118,6 +118,9 @@ server <- function(input, output, session) {
   
   output$plot_airtemp <- renderPlot({
     gsi_plot_airtemp(data_filtered())
+    # daily summarized alternative:
+    # gsi_plot_airtemp_daily(data_filtered())
+    # Idea: hook this up to a switch in the card so you can switch between hourly and daily views?
   })
   
   output$plot_precip <- renderPlot({
