@@ -16,7 +16,7 @@ This project uses [`renv`](https://rstudio.github.io/renv/articles/renv.html) fo
 
 ### Shiny app structure
 
-The content and layout of the dashboard is defined in `app.R`.  Custom functions used (e.g. to create plots) follow the form `gsi_*()` and are defined in scripts in the `R/` directory.
+The content and layout of the dashboard is defined in `app/app.R`.  Custom functions used (e.g. to create plots) follow the form `gsi_*()` and are defined in scripts in the `app/R/` directory.
 
 To learn more about Shiny and the `bslib` package (used to define the UI of the dashboard), see these resources:
 
@@ -30,7 +30,7 @@ The theme for all of the `ggplot2` plots in the dashboard is controlled by `R/0-
 (the filename starts with '0' because the files are sourced alphabetically and the theme is used by all the other functions in `R/`).
 
 ## Deployment
-<!-- aspirational:
-This app is published to \<URL\> automatically by a GitHub action whenever changes are made to the main branch of this repository.
+<!-- aspirational: 
+This app is published to <https://viz.datascience.arizona.edu/gsi-dashboard/> automatically by a GitHub action whenever changes are made to the main branch of this repository.
 If changes are not being reflected on the deployed app or there are other issues with the live app, please contact \@cct-datascience.
 -->
