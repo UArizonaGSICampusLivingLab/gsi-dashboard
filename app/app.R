@@ -19,7 +19,8 @@ gsi_get_data()
 # Read in data and join with site info
 data_full <- 
   read_csv("data/gsi_living_lab_data.csv") |> 
-  right_join(site_info)
+  right_join(site_info) |> 
+  mutate(datetime = with_tz(datetime, "America/Phoenix"))
 
 # UI ----------------------------------------------------------------------
 ui <- page_navbar(
@@ -29,7 +30,7 @@ ui <- page_navbar(
     # This could be a value_box instead of just plain text
     paste("Data last updated ", 
           format(max(data_full$datetime, na.rm = TRUE),
-                 "%Y/%m/%d %H:%M")),
+                 "%Y/%m/%d %H:%M")), #TODO check that timezone is AZ and not UTC
     selectInput(
       inputId = "site",
       label = "Site",
