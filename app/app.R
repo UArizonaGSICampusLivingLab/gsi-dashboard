@@ -10,10 +10,10 @@ library(boxr)
 library(glue)
 
 # Read in metadata
-site_info <- read_csv("metadata.csv")
+site_info <- read_csv("data/site_info.csv")
 
 # Download most recent data from Box
-box_auth_service()
+box_auth_service(token_text = Sys.getenv("BOX_TOKEN_TEXT"))
 gsi_get_data()
 
 # Read in data and join with site info
@@ -52,51 +52,33 @@ ui <- page_navbar(
     "Atmospheric",
     card(
       full_screen = TRUE,
-      # I commented out the headers because i felt like they took up too much space.
-      # card_header("Air Temperature"),
       plotOutput("plot_airtemp")
     ),
     card(
       full_screen = TRUE,
-      # card_header("Precipitation"),
       plotOutput("plot_precip")
     ),
     card(
       full_screen = TRUE,
-      # card_header("Vapor Pressure and VPD"),
       plotOutput("plot_vp")
     )
   ),
   nav_panel(
-    "Soil"
+    "Soil",
+    
   ),
   nav_panel(
     "Environmental Plots" #plant-available water, other calculated values
   ),
 
   nav_panel(
-    "value box demo",
-
+    "value box demo", 
+    #TODO: try putting these in sidebar
     layout_columns(
       height = "20%",
       uiOutput("stat_airtemp"),
       uiOutput("stat_soiltemp"),
       uiOutput("stat_precip")
-    ),
-    card(height = "27%",
-         full_screen = TRUE,
-         card_header("Soil Moisture"),
-         card_body("")
-    ),
-    card(height = "27%",
-         full_screen = TRUE,
-         card_header("Precipitation"),
-         card_body("plot goes here")
-    ),
-    card(height = "27%",
-         full_screen = TRUE,
-         card_header("Soil Temperature"),
-         card_body("plot goes here")
     )
   ),
 )
