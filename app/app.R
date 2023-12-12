@@ -31,10 +31,16 @@ ui <- page_navbar(
     paste("Data last updated ", 
           format(max(data_full$datetime, na.rm = TRUE),
                  "%Y/%m/%d %H:%M")), #TODO check that timezone is AZ and not UTC
-    selectInput(
+    # selectInput(
+    #   inputId = "site",
+    #   label = "Site",
+    #   choices = unique(data_full$site)
+    # ),
+    checkboxGroupInput(
       inputId = "site",
       label = "Site",
-      choices = unique(data_full$site)
+      choices = unique(data_full$site),
+      selected = unique(data_full$site)
     ),
     airDatepickerInput(
       inputId = "daterange",
@@ -90,7 +96,7 @@ ui <- page_navbar(
 server <- function(input, output, session) {
   data_filtered <- reactive({
     data_full |> 
-      filter(site == input$site) |> 
+      filter(site %in% input$site) |> 
       filter(datetime >= input$daterange[1], datetime <= input$daterange[2])
   })
   

@@ -8,8 +8,8 @@ gsi_plot_airtemp <- function(data) {
     data |> 
     filter(str_starts(sensor, "ATM"))
   
-  ggplot(data_atm, aes(x = datetime, y = air_temperature.value)) +
-    geom_line(color = "darkred") +
+  ggplot(data_atm, aes(x = datetime, y = air_temperature.value, color = site)) +
+    geom_line() +
     #this makes the line go all the way to the edge of the plot.  I like this for timeseries
     scale_x_datetime(expand = c(0,0)) +
     labs(y = "Air Temp. (ºC)") +
