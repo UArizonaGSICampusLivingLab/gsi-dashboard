@@ -61,6 +61,7 @@ ui <- page_navbar(
   ),
   nav_panel(
     "Atmospheric",
+    p(HTML(glue::glue_collapse(site_checkbox_names, sep = " | "))),
     card(
       full_screen = TRUE,
       plotOutput("plot_airtemp")
