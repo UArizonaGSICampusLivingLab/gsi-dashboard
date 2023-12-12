@@ -16,6 +16,8 @@ gsi_plot_vpd <- function(data) {
     geom_line(aes(y = vpd.value, linetype = "VPD"), alpha = 0.5, na.rm = TRUE) +
     #this makes the line go all the way to the edge of the plot.  I like this for timeseries
     scale_x_datetime(expand = c(0,0)) +
+    scale_color_manual(values = gsi_site_colors) + #defined in 0-theme_gsi.R
+    guides(color = FALSE) + #turn off legend
     theme(axis.title.x = element_blank(), legend.position = "top") +
     labs(y = "Vapor Pressure / VPD (kPa)")
 }

@@ -12,6 +12,8 @@ gsi_plot_airtemp <- function(data) {
     geom_line() +
     #this makes the line go all the way to the edge of the plot.  I like this for timeseries
     scale_x_datetime(expand = c(0,0)) +
+    scale_color_manual(values = gsi_site_colors) + #defined in 0-theme_gsi.R
+    guides(color = FALSE) + #turn off legend
     labs(y = "Air Temp. (ºC)") +
     theme(axis.title.x = element_blank()) 
 }

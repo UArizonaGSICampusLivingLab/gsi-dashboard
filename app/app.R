@@ -5,6 +5,7 @@ library(bslib)
 library(bsicons)
 library(shinyWidgets)
 
+
 library(tidyverse)
 library(boxr)
 library(glue)
@@ -22,24 +23,27 @@ data_full <-
   right_join(site_info) |> 
   mutate(datetime = with_tz(datetime, "America/Phoenix"))
 
+site_checkbox_names <-
+  map2(names(gsi_site_colors), gsi_site_colors, \(x, y) {
+    HTML(paste(bs_icon("circle-fill", color = y), x))
+  })
+
 # UI ----------------------------------------------------------------------
 ui <- page_navbar(
   title = "GSI Living Lab",
   # fillable = FALSE, # make scrollable.  Try with and without this
   sidebar = sidebar(
+    open = "always", #I think this is necessary if the site legend is combined with the checkboxes.  Might make the dashboard look bad on mobile.
+    
     # This could be a value_box instead of just plain text
     paste("Data last updated ", 
           format(max(data_full$datetime, na.rm = TRUE),
                  "%Y/%m/%d %H:%M")), #TODO check that timezone is AZ and not UTC
-    # selectInput(
-    #   inputId = "site",
-    #   label = "Site",
-    #   choices = unique(data_full$site)
-    # ),
     checkboxGroupInput(
       inputId = "site",
       label = "Site",
-      choices = unique(data_full$site),
+      choiceValues = unique(data_full$site),
+      choiceNames = site_checkbox_names,
       selected = unique(data_full$site)
     ),
     airDatepickerInput(
