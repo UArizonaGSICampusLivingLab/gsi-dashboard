@@ -31,7 +31,6 @@ The theme for all of the `ggplot2` plots in the dashboard is controlled by `R/0-
 (the filename starts with '0' because the files are sourced alphabetically and the theme is used by all the other functions in `R/`).
 
 ## Deployment
-<!-- aspirational: 
+
 This app is published to <https://viz.datascience.arizona.edu/gsi-dashboard/> automatically by a GitHub action whenever changes are made to the main branch of this repository.
 If changes are not being reflected on the deployed app or there are other issues with the live app, please contact \@cct-datascience.
--->
