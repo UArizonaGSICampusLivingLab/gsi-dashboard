@@ -66,7 +66,18 @@ ui <- page_navbar(
   ),
   nav_panel(
     "Soil",
-    
+    card(
+      full_screen = TRUE,
+      plotOutput("plot_soil_temp")
+    ),
+    card(
+      full_screen = TRUE,
+      plotOutput("plot_soil_moisture")
+    ),
+    card(
+      full_screen = TRUE,
+      plotOutput("plot_soil_matric")
+    )
   ),
   nav_panel(
     "Environmental Plots" #plant-available water, other calculated values
@@ -109,6 +120,11 @@ server <- function(input, output, session) {
   output$plot_precip <- renderPlot({
     gsi_plot_precip(data_filtered())
   })
+  
+  output$plot_soil_temp <- renderPlot({
+    gsi_plot_soil(data_filtered(), yvar = "soil_temperature.value")
+  })
+  
   
   ##  Value boxes -------
   output$stat_airtemp <- renderUI({
