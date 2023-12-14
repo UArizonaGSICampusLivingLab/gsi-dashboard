@@ -50,3 +50,5 @@ rsconnect/
 
 # large data
 data/gsi_living_lab_data.csv
+app/data/gsi_living_lab_data.csv
+

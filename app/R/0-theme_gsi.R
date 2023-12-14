@@ -13,3 +13,4 @@ theme_gsi <- function() {
 #set it as the default theme for all plots.
 theme_set(theme_gsi())
 
+gsi_site_colors <- c("Old Main" = "#AB0520", "Gould Simpson" = "#70B865", "Physics and Atmospheric Sciences" = "#1E5288")
