@@ -28,7 +28,7 @@ gsi_plot_soil <- function(data, yvar) {
     scale_linetype_manual(values = c("y" = 1, "n" = 2)) +
     guides(color = "none") +
     theme(axis.title.x.bottom = element_blank()) +
-    facet_wrap(~depth, labeller = label_both, ncol = 1, strip.position = "right")
+    facet_grid(depth~site, labeller = label_both)
   
   # Add line only if more than one month.  Otherwise this errors.
   if (length(unique(plot_data$month_num)) > 1) {
