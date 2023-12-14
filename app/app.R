@@ -141,12 +141,12 @@ server <- function(input, output, session) {
   
   output$plot_soil_wc <- renderPlot({
     gsi_plot_soil(data_filtered(), yvar = "water_content.value") +
-      labs(y = "Water Content (units???)")
+      labs(y = "Water Content (m^3/m^3)") #TODO format units better
   })
   
   output$plot_soil_matric <- renderPlot({
     gsi_plot_soil(data_filtered(), yvar = "matric_potential.value") +
-      labs(y = "Matric Potential (units???)")
+      labs(y = "Matric Potential (kPa)")
   })
   
   ##  Value boxes -------
