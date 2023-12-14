@@ -11,7 +11,7 @@ gsi_plot_precip <- function(data) {
     geom_col(position = position_dodge(preserve = "single")) +
     scale_x_datetime(expand = c(0,0)) +
     scale_color_manual(values = gsi_site_colors, aesthetics = c("fill", "color")) + #defined in 0-theme_gsi.R
-    guides(color = FALSE, fill = FALSE) + #turn off legend
+    guides(color = "none", fill = "none") + #turn off legend
     labs(y = "Precipitation (mm)") +
     theme(axis.title.x = element_blank()) 
 }
