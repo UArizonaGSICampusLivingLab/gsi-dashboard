@@ -1,4 +1,5 @@
 library(tidyverse)
+library(patchwork)
 #read in data
 metadata <- read.csv("metadata.csv")
 data <- read.csv("gsi_living_lab_data.csv")|>
@@ -9,17 +10,66 @@ fulldata <- merge(metadata, data, by = c("device_sn", "sensor"))
 #filter data
 input_site <- "Old Main"
 input_mindate <- as.Date("2023-9-01")
-input_maxdate <- as.Date("2023-10-31 00:00:00")
+input_maxdate <- as.Date("2023-10-31 00:00:00") ##ask about pulling the latest date in the data here by default 
 sitetimedata <- fulldata |>
   filter(site == input_site) |>
   filter(datetime >= input_mindate & datetime <= input_maxdate)
 
 
 soil_data <- sitetimedata |> 
-  filter(str_starts(sensor, "T"))   #all soil sensors start with "T"
+  filter(str_starts(sensor, "T"))   #all soil sensors start with "T"  #will need to filter out t21's later maybe
+
+#####Atmospheric graphs 
 
 atmos_data <- sitetimedata |> 
   filter(str_starts(sensor, "A")) #all atmospheric measurement sensors start with "A"
+
+ggplot(data = atmos_data, aes(x = datetime)) +
+  geom_line(aes(y = air_temperature.value), color = "lightblue")+
+  scale_x_datetime(date_breaks = "month") + #see help file section on date_labels for changing how dates are displayed
+  theme_linedraw() +
+  theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  labs(x = "Date", y = "Air Temperature (C)") #change x, y, title, etc.
+
+ggplot(data = atmos_data, aes(x = datetime)) +
+  geom_col(aes(y = precipitation.value), color = "coral")+
+  scale_x_datetime(date_breaks = "month") + #see help file section on date_labels for changing how dates are displayed
+  theme_linedraw() +
+  theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  labs(x = "Date", y = "Precipitation (cm)") #change x, y, title, etc.
+
+ggplot(data = atmos_data, aes(x = datetime)) +
+  geom_line(aes(y = vapor_pressure.value), color = "red")+
+  geom_line(aes(y = vpd.value), color = "blue")+
+ # geom_line(aes(y = atmospheric_pressure.value), color = "green")+
+  scale_x_datetime(date_breaks = "month") + #see help file section on date_labels for changing how dates are displayed
+  theme_linedraw() +
+  theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  scale_color_manual(name = "Variables", 
+                     values = c("red", "blue"), 
+                     labels = c("Vapor Pressure", "VPD"))+
+  labs(x = "Date", y = "Precipitation (cm)") #change x, y, title, etc.
+
+p2 <- ggplot(data = atmos_data, aes(x = datetime)) +
+  geom_line(aes(y = atmospheric_pressure.value), color = "green")+
+  # geom_line(aes(y = atmospheric_pressure.value), color = "green")+
+  scale_x_datetime(date_breaks = "month") + #see help file section on date_labels for changing how dates are displayed
+  theme_linedraw() +
+  theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  labs(x = "Date", y = "(cm)") #change x, y, title, etc.
+
+p2/p1
+
+
+
+
+
+
+
+
+
+
+
 
 #create mean timeseries summary data for soil moisture differentiated by depth 
 soil_temp_mean_depth <- soil_data |> 
@@ -48,7 +98,8 @@ ggplot(data = soil_data, aes(x = datetime)) +
 
 test <- soil_data |>
   select(basin, water_content.value, datetime)
-
+#facet graphs
+#create this graph for an average of each site / edit the legend of this
 # create mean timeseries data for soil moisture differentiated by basin 
 soil_moisture_mean_basin <- soil_data |> 
   filter(water_content.value != "") |>
@@ -65,6 +116,7 @@ ggplot(data = soil_data, aes(x = datetime)) +
   theme_linedraw() +
   theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
   labs(color = "Basin Yes/No", x = "Date", y = "Water Content (m³/m³)") #change x, y, title, etc.
+
 
 
 ## make a plot of othis constant time series average for values for each site, graph thos 
@@ -115,3 +167,4 @@ ggplot(data = data_filtered, aes(x = month, y = air_temperature.value, fill = si
 
 
 #assign a plot to an object, then use patchwork package to align the figures and make a cool comparison. 
+
