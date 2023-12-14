@@ -141,7 +141,7 @@ server <- function(input, output, session) {
   
   output$plot_soil_wc <- renderPlot({
     gsi_plot_soil(data_filtered(), yvar = "water_content.value") +
-      labs(y = "Water Content (m^3/m^3)") #TODO format units better
+      labs(y = bquote("Water Content "(m^3/m^3)))
   })
   
   output$plot_soil_matric <- renderPlot({
