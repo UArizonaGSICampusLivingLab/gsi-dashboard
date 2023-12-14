@@ -185,7 +185,7 @@ pointrange_lines +
 #| column: body-outset
 
 pointrange_lines +
-  facet_wrap(~depth, ncol = 1)
+  facet_wrap("depth", ncol = 1, strip.position = "right")
 ```
 
 
