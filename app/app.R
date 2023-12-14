@@ -33,8 +33,6 @@ ui <- page_navbar(
   title = "GSI Living Lab",
   # fillable = FALSE, # make scrollable.  Try with and without this
   sidebar = sidebar(
-    open = "always", #I think this is necessary if the site legend is combined with the checkboxes.  Might make the dashboard look bad on mobile.
-    
     # This could be a value_box instead of just plain text
     paste("Data last updated ", 
           format(max(data_full$datetime, na.rm = TRUE),
@@ -42,8 +40,9 @@ ui <- page_navbar(
     checkboxGroupInput(
       inputId = "site",
       label = "Site",
-      choiceValues = unique(data_full$site),
-      choiceNames = site_checkbox_names,
+      choices = unique(data_full$site),
+      # choiceValues = unique(data_full$site),
+      # choiceNames = site_checkbox_names,
       selected = unique(data_full$site)
     ),
     airDatepickerInput(
@@ -51,9 +50,11 @@ ui <- page_navbar(
       label = "Date Range",
       range = TRUE,
       # Default date range
-      value = c(Sys.Date() - 7, Sys.Date()),
+      # TODO maybe have this depend on which tab.  If its in the soil tab it should show a full year by default.
+      value = c(Sys.Date() - 60, Sys.Date()),
       dateFormat = "MM/dd/yy",
       maxDate = Sys.Date(),
+      minDate = "2023-06-05",
       addon = "none",
       update_on = "close"
     )
@@ -77,7 +78,19 @@ ui <- page_navbar(
   ),
   nav_panel(
     "Soil",
-    
+    p(HTML(glue::glue_collapse(site_checkbox_names, sep = " | "))),
+    card(
+      full_screen = TRUE,
+      plotOutput("plot_soil_temp")
+    ),
+    card(
+      full_screen = TRUE,
+      plotOutput("plot_soil_wc")
+    ),
+    card(
+      full_screen = TRUE,
+      plotOutput("plot_soil_matric")
+    )
   ),
   nav_panel(
     "Environmental Plots" #plant-available water, other calculated values
@@ -119,6 +132,21 @@ server <- function(input, output, session) {
   
   output$plot_precip <- renderPlot({
     gsi_plot_precip(data_filtered())
+  })
+  
+  output$plot_soil_temp <- renderPlot({
+    gsi_plot_soil(data_filtered(), yvar = "soil_temperature.value") +
+      labs(y = "Temperature (ºC)")
+  })
+  
+  output$plot_soil_wc <- renderPlot({
+    gsi_plot_soil(data_filtered(), yvar = "water_content.value") +
+      labs(y = bquote("Water Content "(m^3/m^3)))
+  })
+  
+  output$plot_soil_matric <- renderPlot({
+    gsi_plot_soil(data_filtered(), yvar = "matric_potential.value") +
+      labs(y = "Matric Potential (kPa)")
   })
   
   ##  Value boxes -------
