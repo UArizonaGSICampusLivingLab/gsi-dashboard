@@ -22,12 +22,7 @@ data_full <-
   read_csv("data/gsi_living_lab_data.csv") |> 
   right_join(site_info) |> 
   mutate(datetime = with_tz(datetime, "America/Phoenix"))
-
-site_checkbox_names <-
-  map2(names(gsi_site_colors), gsi_site_colors, \(x, y) {
-    HTML(paste(bs_icon("circle-fill", color = y), x))
-  })
-
+# legend <- make_legend(unique(data_full$site))
 # UI ----------------------------------------------------------------------
 ui <- page_navbar(
   title = "GSI Living Lab",
@@ -41,8 +36,6 @@ ui <- page_navbar(
       inputId = "site",
       label = "Site",
       choices = unique(data_full$site),
-      # choiceValues = unique(data_full$site),
-      # choiceNames = site_checkbox_names,
       selected = unique(data_full$site)
     ),
     airDatepickerInput(
@@ -62,7 +55,7 @@ ui <- page_navbar(
   ),
   nav_panel(
     "Atmospheric",
-    p(HTML(glue::glue_collapse(site_checkbox_names, sep = " | "))),
+    htmlOutput("legend1"),
     card(
       full_screen = TRUE,
       plotOutput("plot_airtemp")
@@ -78,7 +71,7 @@ ui <- page_navbar(
   ),
   nav_panel(
     "Soil",
-    p(HTML(glue::glue_collapse(site_checkbox_names, sep = " | "))),
+    htmlOutput("legend2"),
     card(
       full_screen = TRUE,
       plotOutput("plot_soil_temp")
@@ -93,7 +86,8 @@ ui <- page_navbar(
     )
   ),
   nav_panel(
-    "Environmental Plots" #plant-available water, other calculated values
+    "Environmental Plots",
+    htmlOutput("legend3"),
   ),
 
   nav_panel(
@@ -116,6 +110,11 @@ server <- function(input, output, session) {
     data_full |> 
       filter(site %in% input$site) |> 
       filter(datetime >= input$daterange[1], datetime <= input$daterange[2])
+  })
+  ## Legend -------
+  #can't re-use output objects, so make one for each tab
+  output$legend1 <- output$legend2 <- output$legend3 <- renderUI({
+    make_legend(input$site)
   })
   
   ## Plots --------
