@@ -8,16 +8,16 @@ gsi_plot_vpd <- function(data) {
     data |> 
     filter(str_starts(sensor, "ATM")) 
   
-  ggplot(data_atm, aes(x = datetime)) +
+  ggplot(data_atm, aes(x = datetime, color = site)) +
     #rather than map color to a column in the data or set it manually, we do a
     #third thing—set it to a character string *inside* of aes().  This is a
     #"trick" for creating a color legend
-    geom_line(aes(y = vapor_pressure.value, color = "VP"), alpha = 0.5, na.rm = TRUE) +
-    geom_line(aes(y = vpd.value, color = "VPD"), alpha = 0.5, na.rm = TRUE) +
-    #adjust colors manually
-    scale_color_manual(name = "", values = c("VP" = "blue", "VPD" = "darkgreen")) +
+    geom_line(aes(y = vapor_pressure.value, linetype = "VP"), alpha = 0.5, na.rm = TRUE) +
+    geom_line(aes(y = vpd.value, linetype = "VPD"), alpha = 0.5, na.rm = TRUE) +
     #this makes the line go all the way to the edge of the plot.  I like this for timeseries
     scale_x_datetime(expand = c(0,0)) +
+    scale_color_manual(values = gsi_site_colors) + #defined in 0-theme_gsi.R
+    guides(color = "none") + #turn off legend
     theme(axis.title.x = element_blank(), legend.position = "top") +
     labs(y = "Vapor Pressure / VPD (kPa)")
 }
