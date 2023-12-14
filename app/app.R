@@ -33,8 +33,6 @@ ui <- page_navbar(
   title = "GSI Living Lab",
   # fillable = FALSE, # make scrollable.  Try with and without this
   sidebar = sidebar(
-    open = "always", #I think this is necessary if the site legend is combined with the checkboxes.  Might make the dashboard look bad on mobile.
-    
     # This could be a value_box instead of just plain text
     paste("Data last updated ", 
           format(max(data_full$datetime, na.rm = TRUE),
@@ -42,8 +40,9 @@ ui <- page_navbar(
     checkboxGroupInput(
       inputId = "site",
       label = "Site",
-      choiceValues = unique(data_full$site),
-      choiceNames = site_checkbox_names,
+      choices = unique(data_full$site),
+      # choiceValues = unique(data_full$site),
+      # choiceNames = site_checkbox_names,
       selected = unique(data_full$site)
     ),
     airDatepickerInput(
@@ -79,6 +78,7 @@ ui <- page_navbar(
   ),
   nav_panel(
     "Soil",
+    p(HTML(glue::glue_collapse(site_checkbox_names, sep = " | "))),
     card(
       full_screen = TRUE,
       plotOutput("plot_soil_temp")
