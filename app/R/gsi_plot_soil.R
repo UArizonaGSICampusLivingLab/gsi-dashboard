@@ -41,5 +41,4 @@ gsi_plot_soil <- function(data, yvar) {
   p
 }
 
-## to plug into shiny app, !!as.name("character_string")
 # gsi_plot_soil(data_filtered, yvar = "soil_temperature.value", depth = 0.15)
