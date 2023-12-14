@@ -41,9 +41,11 @@ ui <- page_navbar(
       label = "Date Range",
       range = TRUE,
       # Default date range
+      # TODO maybe have this depend on which tab.  If its in the soil tab it should show a full year by default.
       value = c(Sys.Date() - 7, Sys.Date()),
       dateFormat = "MM/dd/yy",
       maxDate = Sys.Date(),
+      minDate = "2023-06-05",
       addon = "none",
       update_on = "close"
     )
@@ -72,7 +74,7 @@ ui <- page_navbar(
     ),
     card(
       full_screen = TRUE,
-      plotOutput("plot_soil_moisture")
+      plotOutput("plot_soil_wc")
     ),
     card(
       full_screen = TRUE,
@@ -125,6 +127,13 @@ server <- function(input, output, session) {
     gsi_plot_soil(data_filtered(), yvar = "soil_temperature.value")
   })
   
+  output$plot_soil_wc <- renderPlot({
+    gsi_plot_soil(data_filtered(), yvar = "water_content.value")
+  })
+  
+  output$plot_soil_matric <- renderPlot({
+    gsi_plot_soil(data_filtered(), yvar = "matric_potential.value")
+  })
   
   ##  Value boxes -------
   output$stat_airtemp <- renderUI({
