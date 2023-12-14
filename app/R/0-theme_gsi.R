@@ -7,6 +7,7 @@ theme_gsi <- function() {
       # panel.border = element_blank(),
       panel.grid.major = element_blank(),
       panel.grid.minor = element_blank(),
+      strip.background = element_rect(fill = "#AB0520")
     )
 }
 
