@@ -12,19 +12,20 @@ gsi_plot_soil <- function(data, yvar) {
     mutate(depth = paste(-depth_height_m, "m")) |> 
     filter(!is.na(.data[[yvar]])) 
   
+  #separate the points a bit for better readability
+  dodge <- position_dodge(width = 0.4)
+  
   p <- 
     ggplot(plot_data, 
            aes(x = month_num, y = .data[[yvar]], linetype = basin, shape = basin, color = site)) +
-    stat_summary(fun.data = mean_sdl, position = position_dodge(width = 0.7)) +
+    stat_summary(fun.data = mean_sdl, position = dodge) +
     scale_x_continuous(
       name = "month",
       breaks = \(x) round(x[1]):round(x[2]),
       labels = \(x) month(x, label = TRUE)
     ) +
-  
-  #TODO: this is in the PR for the atmospheric tab
-  # scale_color_manual() + 
-  scale_linetype_manual(values = c("y" = 1, "n" = 2)) +
+    scale_color_manual(values = gsi_site_colors) + #defined in 0-theme_gsi.R
+    scale_linetype_manual(values = c("y" = 1, "n" = 2)) +
     guides(color = "none") +
     theme(axis.title.x.bottom = element_blank()) +
     facet_wrap(~depth, labeller = label_both, ncol = 1, strip.position = "right")
@@ -33,7 +34,7 @@ gsi_plot_soil <- function(data, yvar) {
   if (length(unique(plot_data$month_num)) > 1) {
     p <-
       p + 
-      stat_summary(fun = mean, geom = "line", position = position_dodge(width = 0.7))
+      stat_summary(fun = mean, geom = "line", position = dodge)
   }
   
   #return:
