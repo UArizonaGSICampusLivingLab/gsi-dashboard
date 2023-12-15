@@ -26,30 +26,50 @@ data_full <-
 # UI ----------------------------------------------------------------------
 ui <- page_navbar(
   title = "GSI Living Lab",
+  id = "navbar",
   # fillable = FALSE, # make scrollable.  Try with and without this
   sidebar = sidebar(
     # This could be a value_box instead of just plain text
     paste("Data last updated ", 
           format(max(data_full$datetime, na.rm = TRUE),
-                 "%Y/%m/%d %H:%M")), #TODO check that timezone is AZ and not UTC
+                 "%Y/%m/%d %H:%M")),
     checkboxGroupInput(
       inputId = "site",
       label = "Site",
       choices = unique(data_full$site),
       selected = unique(data_full$site)
     ),
-    airDatepickerInput(
-      inputId = "daterange",
-      label = "Date Range",
-      range = TRUE,
-      # Default date range
-      # TODO maybe have this depend on which tab.  If its in the soil tab it should show a full year by default.
-      value = c(Sys.Date() - 60, Sys.Date()),
-      dateFormat = "MM/dd/yy",
-      maxDate = Sys.Date(),
-      minDate = "2023-06-05",
-      addon = "none",
-      update_on = "close"
+    conditionalPanel(
+      "input.navbar == 'Atmospheric'",
+      airDatepickerInput(
+        inputId = "daterange",
+        label = "Date Range",
+        range = TRUE,
+        # Default date range
+        value = c(Sys.Date() - 7, Sys.Date()),
+        dateFormat = "MM/dd/yy",
+        maxDate = Sys.Date(),
+        minDate = "2023-06-05",
+        addon = "none",
+        update_on = "close"
+      )
+    ),
+    conditionalPanel(
+      "input.navbar == 'Soil'",
+      airDatepickerInput(
+        inputId = "monthrange",
+        label = "Date Range",
+        range = TRUE,
+        # Default date range
+        value = c(Sys.Date() - 365, Sys.Date()),
+        dateFormat = "MM/dd/yy",
+        maxDate = Sys.Date(),
+        minDate = "2023-06-05",
+        view = "months",
+        minView = "months",
+        addon = "none",
+        update_on = "close"
+      )
     )
     
   ),
@@ -89,7 +109,7 @@ ui <- page_navbar(
     "Environmental Plots",
     htmlOutput("legend3"),
   ),
-
+  
   nav_panel(
     "value box demo", 
     #TODO: try putting these in sidebar
@@ -106,10 +126,15 @@ ui <- page_navbar(
 # Server ------------------------------------------------------------------
 
 server <- function(input, output, session) {
-  data_filtered <- reactive({
+  data_filtered_atm <- reactive({
     data_full |> 
       filter(site %in% input$site) |> 
       filter(datetime >= input$daterange[1], datetime <= input$daterange[2])
+  })
+  data_filtered_soil <- reactive({
+    data_full |> 
+      filter(site %in% input$site) |> 
+      filter(datetime >= input$monthrange[1], datetime <= input$monthrange[2])
   })
   ## Legend -------
   #can't re-use output objects, so make one for each tab
@@ -119,32 +144,32 @@ server <- function(input, output, session) {
   
   ## Plots --------
   output$plot_vp <- renderPlot({
-    gsi_plot_vpd(data_filtered())
+    gsi_plot_vpd(data_filtered_atm())
   })
   
   output$plot_airtemp <- renderPlot({
-    gsi_plot_airtemp(data_filtered())
+    gsi_plot_airtemp(data_filtered_atm())
     # daily summarized alternative:
     # gsi_plot_airtemp_daily(data_filtered())
     # Idea: hook this up to a switch in the card so you can switch between hourly and daily views?
   })
   
   output$plot_precip <- renderPlot({
-    gsi_plot_precip(data_filtered())
+    gsi_plot_precip(data_filtered_atm())
   })
   
   output$plot_soil_temp <- renderPlot({
-    gsi_plot_soil(data_filtered(), yvar = "soil_temperature.value") +
+    gsi_plot_soil(data_filtered_soil(), yvar = "soil_temperature.value") +
       labs(y = "Temperature (ºC)")
   })
   
   output$plot_soil_wc <- renderPlot({
-    gsi_plot_soil(data_filtered(), yvar = "water_content.value") +
+    gsi_plot_soil(data_filtered_soil(), yvar = "water_content.value") +
       labs(y = bquote("Water Content "(m^3/m^3)))
   })
   
   output$plot_soil_matric <- renderPlot({
-    gsi_plot_soil(data_filtered(), yvar = "matric_potential.value") +
+    gsi_plot_soil(data_filtered_soil(), yvar = "matric_potential.value") +
       labs(y = "Matric Potential (kPa)")
   })
   
