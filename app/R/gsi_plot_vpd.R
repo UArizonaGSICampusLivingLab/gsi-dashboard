@@ -12,8 +12,8 @@ gsi_plot_vpd <- function(data) {
     #rather than map color to a column in the data or set it manually, we do a
     #third thing—set it to a character string *inside* of aes().  This is a
     #"trick" for creating a color legend
-    geom_line(aes(y = vapor_pressure.value, linetype = "VP"), alpha = 0.5, na.rm = TRUE) +
-    geom_line(aes(y = vpd.value, linetype = "VPD"), alpha = 0.5, na.rm = TRUE) +
+    geom_line(aes(y = vapor_pressure.value, linetype = "VP"), linewidth = 0.65, alpha = 0.5, na.rm = TRUE) +
+    geom_line(aes(y = vpd.value, linetype = "VPD"), linewidth = 0.65, alpha = 0.5, na.rm = TRUE) +
     #this makes the line go all the way to the edge of the plot.  I like this for timeseries
     scale_x_datetime(expand = c(0,0)) +
     scale_color_manual(values = gsi_site_colors) + #defined in 0-theme_gsi.R
