@@ -60,8 +60,8 @@ ui <- page_navbar(
         inputId = "monthrange",
         label = "Date Range",
         range = TRUE,
-        # Default date range
-        value = c(Sys.Date() - 365, Sys.Date()),
+        # Default date range is a year ago or to the earliest day of data, whichever is more recent
+        value = c(max(Sys.Date() - 365, as.Date("2023-06-05")), Sys.Date()), 
         dateFormat = "MM/dd/yy",
         maxDate = Sys.Date(),
         minDate = "2023-06-05",
@@ -71,7 +71,6 @@ ui <- page_navbar(
         update_on = "close"
       )
     )
-    
   ),
   nav_panel(
     "Atmospheric",
