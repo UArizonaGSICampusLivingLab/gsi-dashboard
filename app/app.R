@@ -26,32 +26,51 @@ data_full <-
 # UI ----------------------------------------------------------------------
 ui <- page_navbar(
   title = "GSI Living Lab",
+  id = "navbar",
   # fillable = FALSE, # make scrollable.  Try with and without this
   sidebar = sidebar(
     # This could be a value_box instead of just plain text
     paste("Data last updated ", 
           format(max(data_full$datetime, na.rm = TRUE),
-                 "%Y/%m/%d %H:%M")), #TODO check that timezone is AZ and not UTC
+                 "%Y/%m/%d %H:%M")),
     checkboxGroupInput(
       inputId = "site",
       label = "Site",
       choices = unique(data_full$site),
       selected = unique(data_full$site)
     ),
-    airDatepickerInput(
-      inputId = "daterange",
-      label = "Date Range",
-      range = TRUE,
-      # Default date range
-      # TODO maybe have this depend on which tab.  If its in the soil tab it should show a full year by default.
-      value = c(Sys.Date() - 60, Sys.Date()),
-      dateFormat = "MM/dd/yy",
-      maxDate = Sys.Date(),
-      minDate = "2023-06-05",
-      addon = "none",
-      update_on = "close"
+    conditionalPanel(
+      "input.navbar == 'Atmospheric'",
+      airDatepickerInput(
+        inputId = "daterange",
+        label = "Date Range",
+        range = TRUE,
+        # Default date range
+        value = c(Sys.Date() - 7, Sys.Date()),
+        dateFormat = "MM/dd/yy",
+        maxDate = Sys.Date(),
+        minDate = "2023-06-05",
+        addon = "none",
+        update_on = "close"
+      )
+    ),
+    conditionalPanel(
+      "input.navbar == 'Soil'",
+      airDatepickerInput(
+        inputId = "monthrange",
+        label = "Date Range",
+        range = TRUE,
+        # Default date range is a year ago or to the earliest day of data, whichever is more recent
+        value = c(max(Sys.Date() - 365, as.Date("2023-06-05")), Sys.Date()), 
+        dateFormat = "MM/dd/yy",
+        maxDate = Sys.Date(),
+        minDate = "2023-06-05",
+        view = "months",
+        minView = "months",
+        addon = "none",
+        update_on = "close"
+      )
     )
-    
   ),
   nav_panel(
     "Atmospheric",
@@ -89,27 +108,32 @@ ui <- page_navbar(
     "Environmental Plots",
     htmlOutput("legend3"),
   ),
-
-  nav_panel(
-    "value box demo", 
-    #TODO: try putting these in sidebar
-    layout_columns(
-      height = "20%",
-      uiOutput("stat_airtemp"),
-      uiOutput("stat_soiltemp"),
-      uiOutput("stat_precip")
-    )
-  ),
+  
+  # nav_panel(
+  #   "value box demo", 
+  #   #TODO: try putting these in sidebar
+  #   layout_columns(
+  #     height = "20%",
+  #     uiOutput("stat_airtemp"),
+  #     uiOutput("stat_soiltemp"),
+  #     uiOutput("stat_precip")
+  #   )
+  # ),
 )
 
 
 # Server ------------------------------------------------------------------
 
 server <- function(input, output, session) {
-  data_filtered <- reactive({
+  data_filtered_atm <- reactive({
     data_full |> 
       filter(site %in% input$site) |> 
       filter(datetime >= input$daterange[1], datetime <= input$daterange[2])
+  })
+  data_filtered_soil <- reactive({
+    data_full |> 
+      filter(site %in% input$site) |> 
+      filter(datetime >= input$monthrange[1], datetime <= input$monthrange[2])
   })
   ## Legend -------
   #can't re-use output objects, so make one for each tab
@@ -119,92 +143,92 @@ server <- function(input, output, session) {
   
   ## Plots --------
   output$plot_vp <- renderPlot({
-    gsi_plot_vpd(data_filtered())
+    gsi_plot_vpd(data_filtered_atm())
   })
   
   output$plot_airtemp <- renderPlot({
-    gsi_plot_airtemp(data_filtered())
+    gsi_plot_airtemp(data_filtered_atm())
     # daily summarized alternative:
     # gsi_plot_airtemp_daily(data_filtered())
     # Idea: hook this up to a switch in the card so you can switch between hourly and daily views?
   })
   
   output$plot_precip <- renderPlot({
-    gsi_plot_precip(data_filtered())
+    gsi_plot_precip(data_filtered_atm())
   })
   
   output$plot_soil_temp <- renderPlot({
-    gsi_plot_soil(data_filtered(), yvar = "soil_temperature.value") +
+    gsi_plot_soil(data_filtered_soil(), yvar = "soil_temperature.value") +
       labs(y = "Temperature (ºC)")
   })
   
   output$plot_soil_wc <- renderPlot({
-    gsi_plot_soil(data_filtered(), yvar = "water_content.value") +
+    gsi_plot_soil(data_filtered_soil(), yvar = "water_content.value") +
       labs(y = bquote("Water Content "(m^3/m^3)))
   })
   
   output$plot_soil_matric <- renderPlot({
-    gsi_plot_soil(data_filtered(), yvar = "matric_potential.value") +
+    gsi_plot_soil(data_filtered_soil(), yvar = "matric_potential.value") +
       labs(y = "Matric Potential (kPa)")
   })
   
   ##  Value boxes -------
-  output$stat_airtemp <- renderUI({
-    airtemp <- data_filtered()$air_temperature.value
-    
-    airtemp_vals <- 
-      c(
-        max(airtemp, na.rm = TRUE),
-        mean(airtemp, na.rm = TRUE),
-        min(airtemp, na.rm = TRUE)
-      ) |> 
-      round(2)
-    
-    value_box(
-      title = "Air Temperature",
-      value =  HTML(glue("
-           H: {airtemp_vals[1]} ºC<br>
-           M: {airtemp_vals[2]} ºC<br>
-           L: {airtemp_vals[3]} ºC
-           ")),
-      showcase = bs_icon("thermometer")
-    )
-  })
-  
-  output$stat_soiltemp <- renderUI({
-    soiltemp <- data_filtered()$soil_temperature.value
-    soiltemp_vals <- 
-      c(
-        max(soiltemp, na.rm = TRUE),
-        mean(soiltemp, na.rm = TRUE),
-        min(soiltemp, na.rm = TRUE)
-      ) |> 
-      round(2)
-    value_box(
-      title = "Soil Temperature",
-      value =  HTML(glue("
-           H: {soiltemp_vals[1]} ºC<br>
-           M: {soiltemp_vals[2]} ºC<br>
-           L: {soiltemp_vals[3]} ºC
-           ")),
-      showcase = bs_icon("thermometer")
-    )
-  })
-  
-  output$stat_precip<- renderUI({
-    
-    precip_total <- 
-      data_filtered()$precipitation.value |> 
-      sum(na.rm = TRUE) |> 
-      round(1)
-    
-    value_box(
-      title = "Total Precipitation",
-      #TODO: check that units are correct
-      value = paste(precip_total, "mm"),
-      showcase = bs_icon("cloud-rain")
-    )
-  })
+  # output$stat_airtemp <- renderUI({
+  #   airtemp <- data_filtered()$air_temperature.value
+  #   
+  #   airtemp_vals <- 
+  #     c(
+  #       max(airtemp, na.rm = TRUE),
+  #       mean(airtemp, na.rm = TRUE),
+  #       min(airtemp, na.rm = TRUE)
+  #     ) |> 
+  #     round(2)
+  #   
+  #   value_box(
+  #     title = "Air Temperature",
+  #     value =  HTML(glue("
+  #          H: {airtemp_vals[1]} ºC<br>
+  #          M: {airtemp_vals[2]} ºC<br>
+  #          L: {airtemp_vals[3]} ºC
+  #          ")),
+  #     showcase = bs_icon("thermometer")
+  #   )
+  # })
+  # 
+  # output$stat_soiltemp <- renderUI({
+  #   soiltemp <- data_filtered()$soil_temperature.value
+  #   soiltemp_vals <- 
+  #     c(
+  #       max(soiltemp, na.rm = TRUE),
+  #       mean(soiltemp, na.rm = TRUE),
+  #       min(soiltemp, na.rm = TRUE)
+  #     ) |> 
+  #     round(2)
+  #   value_box(
+  #     title = "Soil Temperature",
+  #     value =  HTML(glue("
+  #          H: {soiltemp_vals[1]} ºC<br>
+  #          M: {soiltemp_vals[2]} ºC<br>
+  #          L: {soiltemp_vals[3]} ºC
+  #          ")),
+  #     showcase = bs_icon("thermometer")
+  #   )
+  # })
+  # 
+  # output$stat_precip<- renderUI({
+  #   
+  #   precip_total <- 
+  #     data_filtered()$precipitation.value |> 
+  #     sum(na.rm = TRUE) |> 
+  #     round(1)
+  #   
+  #   value_box(
+  #     title = "Total Precipitation",
+  #     #TODO: check that units are correct
+  #     value = paste(precip_total, "mm"),
+  #     showcase = bs_icon("cloud-rain")
+  #   )
+  # })
 }
 
 shinyApp(ui, server)
