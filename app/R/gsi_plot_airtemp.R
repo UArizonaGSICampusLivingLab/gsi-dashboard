@@ -27,13 +27,13 @@ gsi_plot_airtemp <- function(data, daily = FALSE) {
   if (isTRUE(daily)) {
     p <- 
       ggplot(data_atm, aes(x = date, y = airtemp_mean, ymin = airtemp_low, ymax = airtemp_high)) +
-      geom_line(aes(color = site), linewidth = 0.65) +
-      geom_ribbon(aes(fill = site), alpha = 0.4)
+      geom_line(aes(color = site), linewidth = 1) + #line width from .65 to 1
+      geom_ribbon(aes(fill = site), alpha = 0.2) # alpha from .4 to .2
     
   } else {
     p <-
       ggplot(data_atm, aes(x = datetime, y = air_temperature.value, color = site)) +
-      geom_line(alpha = 0.5, linewidth = 0.65) 
+      geom_line(alpha = 0.75, linewidth = 1.5) #line width from .65 to 1  #transparency to .25 from .5
   }
 
   p +
