@@ -1,0 +1,192 @@
+---
+title: "Soil plot options"
+format: 
+  html:
+    fig-width: 10
+    code-fold: true
+editor: visual
+---
+
+```{r}
+#| message: false
+library(Hmisc)
+library(tidyverse)
+library(here)
+theme_set(theme_bw())
+```
+
+## Read and wrangle data
+
+Read in and join data to site info
+
+```{r}
+site_info <- read_csv(here::here("app/data/site_info.csv"))
+data <- read_csv(here::here("app/data/gsi_living_lab_data.csv"))
+data_full <- 
+  right_join(data, site_info) |> 
+  mutate(datetime = with_tz(datetime, "America/Phoenix"))
+```
+
+Simulate data being filtered by user of dashboard
+
+```{r}
+# for example,  
+data_filtered <- 
+  data_full |> 
+  #simulate user input
+  filter(site %in% c("Old Main", "Gould Simpson")) |> 
+  filter(datetime > "2023-04-12", datetime < "2023-11-11")
+```
+
+Further modification for plotting soil data
+
+```{r}
+data_plot <- 
+  data_filtered |> 
+  #create month column
+  mutate(month_str = month(datetime, label = TRUE), month_num = as.integer(month(datetime, label = FALSE))) |>
+  #recode depth
+  mutate(depth = paste(-depth_height_m, "m")) |> 
+  #only use sensors with soil data
+  filter(!is.na(soil_temperature.value))
+
+```
+
+## Boxplots
+
+One way to show these monthly summaries is with boxplots (or something like them, e.g. violin plots)
+
+```{r}
+#| label: fig-boxplot-basic 
+#| fig-cap: "basic boxplot"
+#| column: body-outset
+boxplot_base <-
+  ggplot(data_plot, aes(x = month_str, y = soil_temperature.value, fill = site, linetype = basin)) +
+  facet_wrap(~depth, labeller = label_both) 
+
+boxplot_base +
+  geom_boxplot()
+```
+
+The outliers shown here are problematic becasue the number of outliers shown depends on sample size.  Let's remove them
+
+```{r}
+#| label: fig-boxplot-better
+#| fig-cap: "boxplot without 'outliers'"
+#| column: body-outset
+boxplot_base + 
+  geom_boxplot(outlier.shape = NA)
+```
+
+`linetype` isn't a very good aesthetic to use with boxplots, but I'm not sure what else there is.  I could probably do something like dark and light shades of three colors for the three sites?
+
+
+```{r}
+#| label: fig-violin
+#| fig-cap: "violin plots with median + IQR marked"
+#| column: body-outset
+boxplot_base + 
+  geom_violin(draw_quantiles = c(0.25, 0.5, 0.75))
+```
+Here's a violin plot version.  Again, linetype doesn't work great
+
+
+## Pointrange plots
+
+An alternative is to just show some central tendency (e.g. mean) and some dispersion (e.g. standard deviation) with a `pointrange` geom.
+
+```{r}
+#| label: fig-pointrange1
+#| fig-cap: "mean ± SD"
+#| column: body-outset
+pointrange_base <-
+  ggplot(data_plot, aes(x = month_str, y = soil_temperature.value, color = site, linetype = basin, shape = basin)) +
+  facet_wrap(~depth, labeller = label_both)
+
+pointrange_base + 
+  stat_summary(fun.data = mean_sdl, position = position_dodge(width = 0.7))
+```
+```{r}
+#| label: fig-pointrange2
+#| fig-cap: "median ± 95%"
+#| column: body-outset
+pointrange_base +
+  stat_summary(fun.data = median_hilow, position = position_dodge(width = 0.7))
+```
+
+
+```{r}
+#| label: fig-pointrange3
+#| fig-cap: "median ± IQR"
+#| column: body-outset
+pointrange_base + 
+  stat_summary(fun.data = median_hilow, fun.args = list(conf.int = c(-0.75, 0.75)), position = position_dodge(width = 0.7))
+```
+
+## Pointrange + lines
+
+I actually kind of like adding lines connecting the points within each site x basin combination to better show the trend over time, but there are two hurdles to do this.  First, month needs to be numeric and second it breaks when there's only one month displayed
+
+```{r}
+#| label: fig-pointrange-line
+#| fig-cap: mean ± SD with connecting lines
+#| column: body-outset
+pointrange_lines <-
+  ggplot(data_plot, aes(x = month_num, y = soil_temperature.value, color = site, linetype = basin, shape = basin)) +
+  stat_summary(fun.data = mean_sdl, position = position_dodge(width = 0.7)) +
+  stat_summary(fun = mean, geom = "line", position = position_dodge(width = 0.7))
+pointrange_lines + facet_wrap(~depth, labeller = label_both) 
+```
+
+I've figured out how to overcome the first problem by changing the labels in `scale_x_continuous()`
+
+```{r}
+#| label: fig-pointrange-lines-labeled
+#| fig-cap: "mean ± SD with connecting lines and month abbreviations"
+#| column: body-outset
+pointrange_month_abbr <- 
+  pointrange_lines +
+  scale_x_continuous(
+    name = "",
+    breaks = \(x) round(x[1]):round(x[2]),
+    labels = \(x) month(x, label = TRUE)
+  ) 
+
+pointrange_month_abbr +
+  facet_wrap(~depth, labeller = label_both)
+```
+
+## Other ways of faceting
+
+There are many possibilities of ways these plots could be faceted.  Here's a few examples
+
+```{r}
+#| label: fig-facet-depth-basin
+#| fig-cap: "depth~basin"
+#| column: body-outset
+pointrange_month_abbr +
+  facet_grid(depth~basin, labeller = label_both) +
+  guides(linetype = "none", shape = "none") #legend is redundant
+```
+
+
+```{r}
+#| label: fig-depth-site
+#| fig-cap: "depth~site"
+#| column: body-outset
+pointrange_lines + 
+  facet_grid(depth~site) +
+  guides(color = "none")
+```
+
+```{r}
+#| label: fig-depth
+#| fig-cap: "just depth, but in rows"
+#| column: body-outset
+
+pointrange_lines +
+  facet_wrap("depth", ncol = 1, strip.position = "right")
+```
+
+
+I like @fig-depth-site because it is clear that the basin is warmer at Old Main but cooler at Gould Simpson (or that there is a error in the site_info.csv?).
