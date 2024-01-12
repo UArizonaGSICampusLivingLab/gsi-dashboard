@@ -29,7 +29,8 @@ theme_gsi <- function() {
       # panel.border = element_blank(),
       panel.grid.major = element_blank(),
       panel.grid.minor = element_blank(),
-      strip.background = element_rect(fill = az_red, color = az_red)
+      strip.background = element_rect(fill = warm_gray, color = warm_gray),
+      strip.text = element_text( size = 14, color = "#001C48", face = "bold" )
     )
 }
 
@@ -38,4 +39,5 @@ theme_set(theme_gsi())
 
 #defines colors for sites for use in scale_color_manual() etc.
 gsi_site_colors <- 
-  c("Old Main" = "#AB0520", "Gould Simpson" = "#70B865", "Physics and Atmospheric Sciences" = "#1E5288")
+  c("Old Main" = "#378DBD", "Gould Simpson" = "#001C48", "Physics and Atmospheric Sciences" = "#AB0520")
+# changed from om =#AB0520, GS = #70B865, PAS = #1E5288
