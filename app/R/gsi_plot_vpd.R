@@ -2,11 +2,24 @@ library(dplyr)
 library(ggplot2)
 
 #' `data`: the dataset already filtered to a single site and a date range
-gsi_plot_vpd <- function(data) {
+#' `daily`: display a daily summary instead of hourly data
+gsi_plot_vpd <- function(data, daily = FALSE) {
   #use just atmospheric sensor data for this plot
   data_atm <- 
     data |> 
     filter(str_starts(sensor, "ATM")) 
+  
+  if (isTRUE(daily)) {
+    data_atm <-
+      data_atm |> 
+      mutate(datetime = floor_date(datetime, "day")) |> 
+      dplyr::summarize(
+        across(c(vapor_pressure.value, vpd.value), \(x) mean(x, na.rm = TRUE)),
+        .by = c(site, datetime)
+      ) |> 
+      #because mean(c(NA, NA, NA), na.rm = TRUE) results in Inf, we need to replace these with regular NAs for better plotting
+      mutate(across(c(vapor_pressure.value, vpd.value), \(x) if_else(!is.finite(x), NA, x)))
+  }
   
   ggplot(data_atm, aes(x = datetime, color = site)) +
     #rather than map color to a column in the data or set it manually, we do a
