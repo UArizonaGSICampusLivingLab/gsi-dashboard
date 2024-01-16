@@ -9,6 +9,7 @@ library(tidyverse)
 library(boxr)
 library(glue)
 library(Hmisc)
+library(plotly)
 
 # Read in metadata
 site_info <- read_csv("data/site_info.csv")
@@ -81,15 +82,15 @@ ui <- page_navbar(
     htmlOutput("legend1"),
     card(
       full_screen = TRUE,
-      plotOutput("plot_airtemp")
+      plotlyOutput("plot_airtemp")
     ),
     card(
       full_screen = TRUE,
-      plotOutput("plot_precip")
+      plotlyOutput("plot_precip")
     ),
     card(
       full_screen = TRUE,
-      plotOutput("plot_vp")
+      plotlyOutput("plot_vp")
     )
   ),
   nav_panel(
@@ -146,16 +147,16 @@ server <- function(input, output, session) {
   })
   
   ## Plots --------
-  output$plot_airtemp <- renderPlot({
-    gsi_plot_airtemp(data_filtered_atm(), daily = input$daily)
+  output$plot_airtemp <- renderPlotly({
+    gsi_plot_airtemp(data_filtered_atm(), daily = input$daily) |> ggplotly()
   })
   
-  output$plot_precip <- renderPlot({
-    gsi_plot_precip(data_filtered_atm(), daily = input$daily)
+  output$plot_precip <- renderPlotly({
+    gsi_plot_precip(data_filtered_atm(), daily = input$daily) |> ggplotly()
   })
   
-  output$plot_vp <- renderPlot({
-    gsi_plot_vpd(data_filtered_atm(), daily = input$daily)
+  output$plot_vp <- renderPlotly({
+    gsi_plot_vpd(data_filtered_atm(), daily = input$daily) |> ggplotly()
   })
   
   output$plot_soil_temp <- renderPlot({

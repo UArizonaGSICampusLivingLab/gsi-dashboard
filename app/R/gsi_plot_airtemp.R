@@ -28,6 +28,7 @@ gsi_plot_airtemp <- function(data, daily = FALSE) {
     p <- 
       ggplot(data_atm, aes(x = date, y = airtemp_mean, ymin = airtemp_low, ymax = airtemp_high)) +
       geom_line(aes(color = site), linewidth = 1) + #line width from .65 to 1
+      #TODO: need to add ribbon after conversion to plotly with add_ribbons() to avoid bug with NAs https://github.com/plotly/plotly.R/issues/1884
       geom_ribbon(aes(fill = site), alpha = 0.2) # alpha from .4 to .2
     
   } else {
@@ -36,11 +37,26 @@ gsi_plot_airtemp <- function(data, daily = FALSE) {
       geom_line(alpha = 0.75, linewidth = 1.5) #line width from .65 to 1  #transparency to .25 from .5
   }
 
-  p +
+  p <- p +
     #this makes the line go all the way to the edge of the plot.  I like this for timeseries
     scale_x_datetime(expand = c(0,0)) +
-    scale_color_manual(values = gsi_site_colors, aesthetics = c("fill", "color")) + #defined in 0-theme_gsi.R
+    scale_color_manual(values = gsi_site_colors) + #defined in 0-theme_gsi.R
+    scale_fill_manual(values = gsi_site_colors) +
     guides(color = "none", fill = "none") + #turn off legend
     labs(y = "Air Temp. (ºC)") +
     theme(axis.title.x = element_blank())   
+  
+  # ggplotly(p)
+  p
 }
+#need something like this, but this doesn't work for unknown reasons:
+# data_full |> 
+#   filter(site == "Physics and Atmospheric Sciences") |> 
+#   gsi_plot_airtemp(daily = TRUE) |> 
+#   add_ribbons(
+#     x = ~date,
+#     y = ~airtemp_mean,
+#     ymin = ~airtemp_low,
+#     ymax = ~airtemp_high,
+#     connectgaps = TRUE
+#   )
