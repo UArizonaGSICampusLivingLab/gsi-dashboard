@@ -23,9 +23,11 @@ data_full <-
   right_join(site_info) |> 
   mutate(datetime = with_tz(datetime, "America/Phoenix"))
 # legend <- make_legend(unique(data_full$site))
+theme <- bs_theme(preset = "shiny")
+
 # UI ----------------------------------------------------------------------
 ui <- page_navbar(
-  theme = bs_theme() |>  bs_theme_update(),
+  theme = bs_theme_update(theme),
   title = "GSI Living Lab", 
   id = "navbar",
   # fillable = FALSE, # make scrollable.  Try with and without this
