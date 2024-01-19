@@ -150,4 +150,4 @@ highchart() |>
     tooltip = list(pointFormat = "{series.name} low: {point.y}", valueSuffix = "ºC")
   ) |>
   hc_xAxis(title = list(text = ""), type = "datetime")
-#TODO add tooltips to polygone vertices
+#TODO figure out better way to do tooltip.  Would be nice if tooltip along line showed mean, min, and max
