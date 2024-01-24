@@ -25,7 +25,8 @@ data_full <-
 # legend <- make_legend(unique(data_full$site))
 # UI ----------------------------------------------------------------------
 ui <- page_navbar(
-  title = "GSI Living Lab",
+  theme = bs_theme() |>  bs_theme_update(),
+  title = "GSI Living Lab", 
   id = "navbar",
   # fillable = FALSE, # make scrollable.  Try with and without this
   sidebar = sidebar(
@@ -129,6 +130,7 @@ ui <- page_navbar(
 # Server ------------------------------------------------------------------
 
 server <- function(input, output, session) {
+  bs_themer() #temporary! Remove before deploying
   data_filtered_atm <- reactive({
     data_full |> 
       filter(site %in% input$site) |> 
