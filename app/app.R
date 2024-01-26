@@ -82,6 +82,22 @@ ui <- page_navbar(
   nav_panel(
     "About",
     includeMarkdown("about.md")
+    # #TODO layout as rows with 90% for body and 10% for value boxes
+    # layout_column_wrap(
+    #   width = 1,
+    #   card(
+    #     min_height = 500,
+    #     card_body(
+    #       includeMarkdown("about.md")
+    #     )
+    #   ),
+    #   layout_column_wrap(
+    #     width = 1/3,
+    #     uiOutput("stat_airtemp"),
+    #     uiOutput("stat_soiltemp"),
+    #     uiOutput("stat_precip")
+    #   )
+    # )
   ),
   nav_panel(
     "Atmospheric",
@@ -118,18 +134,7 @@ ui <- page_navbar(
   nav_panel(
     "Environmental Plots",
     htmlOutput("legend3"),
-  ),
-  
-  # nav_panel(
-  #   "value box demo", 
-  #   #TODO: try putting these in sidebar
-  #   layout_columns(
-  #     height = "20%",
-  #     uiOutput("stat_airtemp"),
-  #     uiOutput("stat_soiltemp"),
-  #     uiOutput("stat_precip")
-  #   )
-  # ),
+  )
 )
 
 
@@ -198,63 +203,63 @@ server <- function(input, output, session) {
       labs(y = "Matric Potential (kPa)")
   })
   
-  ##  Value boxes -------
-  # output$stat_airtemp <- renderUI({
-  #   airtemp <- data_filtered()$air_temperature.value
-  #   
-  #   airtemp_vals <- 
-  #     c(
-  #       max(airtemp, na.rm = TRUE),
-  #       mean(airtemp, na.rm = TRUE),
-  #       min(airtemp, na.rm = TRUE)
-  #     ) |> 
-  #     round(2)
-  #   
-  #   value_box(
-  #     title = "Air Temperature",
-  #     value =  HTML(glue("
-  #          H: {airtemp_vals[1]} ºC<br>
-  #          M: {airtemp_vals[2]} ºC<br>
-  #          L: {airtemp_vals[3]} ºC
-  #          ")),
-  #     showcase = bs_icon("thermometer")
-  #   )
-  # })
-  # 
-  # output$stat_soiltemp <- renderUI({
-  #   soiltemp <- data_filtered()$soil_temperature.value
-  #   soiltemp_vals <- 
-  #     c(
-  #       max(soiltemp, na.rm = TRUE),
-  #       mean(soiltemp, na.rm = TRUE),
-  #       min(soiltemp, na.rm = TRUE)
-  #     ) |> 
-  #     round(2)
-  #   value_box(
-  #     title = "Soil Temperature",
-  #     value =  HTML(glue("
-  #          H: {soiltemp_vals[1]} ºC<br>
-  #          M: {soiltemp_vals[2]} ºC<br>
-  #          L: {soiltemp_vals[3]} ºC
-  #          ")),
-  #     showcase = bs_icon("thermometer")
-  #   )
-  # })
-  # 
-  # output$stat_precip<- renderUI({
-  #   
-  #   precip_total <- 
-  #     data_filtered()$precipitation.value |> 
-  #     sum(na.rm = TRUE) |> 
-  #     round(1)
-  #   
-  #   value_box(
-  #     title = "Total Precipitation",
-  #     #TODO: check that units are correct
-  #     value = paste(precip_total, "mm"),
-  #     showcase = bs_icon("cloud-rain")
-  #   )
-  # })
+  #  Value boxes -------
+  output$stat_airtemp <- renderUI({
+    airtemp <- data_filtered_atm()$air_temperature.value
+
+    airtemp_vals <-
+      c(
+        max(airtemp, na.rm = TRUE),
+        mean(airtemp, na.rm = TRUE),
+        min(airtemp, na.rm = TRUE)
+      ) |>
+      round(2)
+
+    value_box(
+      title = "Air Temperature",
+      value =  HTML(glue("
+           H: {airtemp_vals[1]} ºC<br>
+           M: {airtemp_vals[2]} ºC<br>
+           L: {airtemp_vals[3]} ºC
+           ")),
+      showcase = bs_icon("thermometer")
+    )
+  })
+
+  output$stat_soiltemp <- renderUI({
+    soiltemp <- data_filtered_soil()$soil_temperature.value
+    soiltemp_vals <-
+      c(
+        max(soiltemp, na.rm = TRUE),
+        mean(soiltemp, na.rm = TRUE),
+        min(soiltemp, na.rm = TRUE)
+      ) |>
+      round(2)
+    value_box(
+      title = "Soil Temperature",
+      value =  HTML(glue("
+           H: {soiltemp_vals[1]} ºC<br>
+           M: {soiltemp_vals[2]} ºC<br>
+           L: {soiltemp_vals[3]} ºC
+           ")),
+      showcase = bs_icon("thermometer")
+    )
+  })
+
+  output$stat_precip<- renderUI({
+
+    precip_total <-
+      data_filtered_atm()$precipitation.value |>
+      sum(na.rm = TRUE) |>
+      round(1)
+
+    value_box(
+      title = "Total Precipitation",
+      #TODO: check that units are correct
+      value = paste(precip_total, "mm"),
+      showcase = bs_icon("cloud-rain")
+    )
+  })
 }
 
 shinyApp(ui, server)
