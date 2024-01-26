@@ -30,6 +30,8 @@ ui <- page_navbar(
   id = "navbar",
   # fillable = FALSE, # make scrollable.  Try with and without this
   sidebar = sidebar(
+    id = "sidebar",
+    open = FALSE, #sidebar initially closed on landing page
     # This could be a value_box instead of just plain text
     paste("Data last updated ", 
           format(max(data_full$datetime, na.rm = TRUE),
@@ -76,6 +78,10 @@ ui <- page_navbar(
         update_on = "close"
       )
     )
+  ),
+  nav_panel(
+    "About",
+    includeMarkdown("about.md")
   ),
   nav_panel(
     "Atmospheric",
@@ -131,6 +137,22 @@ ui <- page_navbar(
 
 server <- function(input, output, session) {
   bs_themer() #temporary! Remove before deploying
+
+
+  ## Open sidebar on other tabs --------------------------------------------
+  
+  # sidebar starts hidden, but this opens it when you switch to any tab other
+  # than "About"
+  observe({
+    sidebar_toggle(
+      id = "sidebar",
+      open = input$navbar != "About"
+    )
+  })  
+  
+  
+  ## Get filtered data -----------------------------------------------------
+  
   data_filtered_atm <- reactive({
     data_full |> 
       filter(site %in% input$site) |> 
@@ -141,6 +163,7 @@ server <- function(input, output, session) {
       filter(site %in% input$site) |> 
       filter(datetime >= input$monthrange[1], datetime <= input$monthrange[2])
   })
+  
   ## Legend -------
   #can't re-use output objects, so make one for each tab
   output$legend1 <- output$legend2 <- output$legend3 <- renderUI({
