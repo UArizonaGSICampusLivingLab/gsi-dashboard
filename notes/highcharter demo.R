@@ -114,6 +114,10 @@ as_poly <- function(data, x, ymin, ymax, ...) {
   ) 
 }
 
+#round to 1 decimal place
+data_temp <- data_temp |> 
+  mutate(across(where(is.numeric), \(x) round(x, 1)))
+
 highchart() |>
   hc_add_series(
     data = as_poly(
@@ -132,22 +136,13 @@ highchart() |>
   hc_add_series(
     data = data_temp,
     "line",
-    hcaes(x = date, y = temp_mean, group = site),
-    tooltip = list(pointFormat = "{series.name} mean: {point.y}", valueSuffix = "ºC")
-  ) |>
-  hc_add_series(
-    data = data_temp,
-    "line",
-    hcaes(x = date, y = temp_max, group = site),
-    color = "#00000000",
-    tooltip = list(pointFormat = "{series.name} high: {point.y}", valueSuffix = "ºC")
-  ) |>
-  hc_add_series(
-    data = data_temp,
-    "line",
-    hcaes(x = date, y = temp_min, group = site),
-    color = "#00000000",
-    tooltip = list(pointFormat = "{series.name} low: {point.y}", valueSuffix = "ºC")
-  ) |>
+    hcaes(x = date, y = temp_mean, group = site, min = temp_min, max = temp_max),
+    color = cols,
+    tooltip = list(
+      pointFormat = "{series.name}<br>
+                    - high: {point.max} ºC <br>
+                    - mean: {point.y} ºC <br>
+                    - low: {point.min} ºC <br>
+")
+  ) |> 
   hc_xAxis(title = list(text = ""), type = "datetime")
-#TODO figure out better way to do tooltip.  Would be nice if tooltip along line showed mean, min, and max
