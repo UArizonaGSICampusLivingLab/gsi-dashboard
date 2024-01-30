@@ -14,8 +14,8 @@ library(Hmisc)
 site_info <- read_csv("data/site_info.csv")
 
 # Download most recent data from Box
-box_auth_service(token_text = Sys.getenv("BOX_TOKEN_TEXT"))
-gsi_get_data()
+#box_auth_service(token_text = Sys.getenv("BOX_TOKEN_TEXT"))
+#gsi_get_data()
 
 # Read in data and join with site info
 data_full <- 
@@ -27,7 +27,7 @@ theme <- bs_theme(preset = "shiny")
 
 # UI ----------------------------------------------------------------------
 ui <- page_navbar(
-  theme = bs_theme_update(theme),
+  theme = bs_theme_update(theme, primary = "#81D3EB", font_scale = 1.2),
   title = "GSI Living Lab", 
   id = "navbar",
   # fillable = FALSE, # make scrollable.  Try with and without this
@@ -132,7 +132,7 @@ ui <- page_navbar(
 # Server ------------------------------------------------------------------
 
 server <- function(input, output, session) {
-  bs_themer() #temporary! Remove before deploying
+  #bs_themer() #temporary! Remove before deploying
   data_filtered_atm <- reactive({
     data_full |> 
       filter(site %in% input$site) |> 
