@@ -22,7 +22,9 @@ data_full <-
   read_csv("data/gsi_living_lab_data.csv") |> 
   right_join(site_info) |> 
   mutate(datetime = with_tz(datetime, "America/Phoenix"))
-# legend <- make_legend(unique(data_full$site))
+
+
+
 # UI ----------------------------------------------------------------------
 ui <- page_navbar(
   theme = bs_theme() |>  bs_theme_update(),
@@ -81,22 +83,14 @@ ui <- page_navbar(
   ),
   nav_panel(
     "About",
-    includeMarkdown("about.md")
-    # #TODO layout as rows with 90% for body and 10% for value boxes
-    # layout_column_wrap(
-    #   width = 1,
-    #   card(
-    #     min_height = 500,
-    #     card_body(
-    #       includeMarkdown("about.md")
-    #     )
-    #   ),
-    #   layout_column_wrap(
-    #     width = 1/3,
-    #     uiOutput("stat_airtemp"),
-    #     uiOutput("stat_soiltemp"),
-    #     uiOutput("stat_precip")
-    #   )
+    layout_column_wrap(
+      width = 1/3,
+      value_latest,
+      value_latest,
+      value_latest
+    )
+    # card(
+    #   includeMarkdown("about.md"),
     # )
   ),
   nav_panel(
@@ -181,7 +175,7 @@ server <- function(input, output, session) {
   })
   
   output$plot_precip <- renderPlot({
-    gsi_plot_precip(data_filtered_atm(), daily = input$daily)
+    gsi_plot_precip(data_filtered_atm(), daily = input$daily) |> ggplotly()
   })
   
   output$plot_vp <- renderPlot({
