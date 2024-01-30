@@ -14,8 +14,8 @@ library(Hmisc)
 site_info <- read_csv("data/site_info.csv")
 
 # Download most recent data from Box
-#box_auth_service(token_text = Sys.getenv("BOX_TOKEN_TEXT"))
-#gsi_get_data()
+box_auth_service(token_text = Sys.getenv("BOX_TOKEN_TEXT"))
+gsi_get_data()
 
 # Read in data and join with site info
 data_full <- 
