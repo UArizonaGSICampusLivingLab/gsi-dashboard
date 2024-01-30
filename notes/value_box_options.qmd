@@ -1,0 +1,176 @@
+---
+title: "Value box ideas"
+format: 
+  html:
+    code-fold: true
+    html-table-processing: none
+editor: visual
+execute: 
+  warning: false
+  error: false
+  messages: false
+---
+
+```{r}
+#| label: setup
+
+library(bslib)
+library(bsicons)
+library(tidyverse)
+library(here)
+library(shiny)
+library(glue)
+library(knitr)
+source(here("app/R/gsi_get_data.R"))
+```
+
+In this document I test out a few options for value boxes.
+For each one I present them singly, and as a 3-column layout taking the full width of the browser.
+
+```{r}
+#| include: false
+# Read in metadata
+site_info <- read_csv(here("app/data/site_info.csv"))
+
+# Download most recent data from Box
+box_auth_service(token_text = Sys.getenv("BOX_TOKEN_TEXT"))
+gsi_get_data()
+
+# Read in data and join with site info
+data_full <- 
+  read_csv(here("app/data/gsi_living_lab_data.csv")) |> 
+  right_join(site_info) |> 
+  mutate(datetime = with_tz(datetime, "America/Phoenix"))
+```
+
+Filter to most recent data.
+
+```{r}
+latest_airtemp <-
+  data_full |> 
+  group_by(site) |> 
+  select(datetime, air_temperature.value) |> 
+  filter(!is.na(air_temperature.value)) |> 
+  filter(datetime == max(datetime)) 
+
+latest_precip <-
+  data_full |> 
+  group_by(site) |> 
+  select(datetime, precipitation.value) |> 
+  filter(!is.na(precipitation.value)) |> 
+  filter(datetime == max(datetime)) 
+
+latest_soiltemp <- 
+  data_full |> 
+  group_by(site) |> 
+  select(datetime, depth_height_m, basin, soil_temperature.value) |> 
+  filter(!is.na(soil_temperature.value)) |> 
+  filter(datetime == max(datetime))
+
+```
+
+Latest conditions in all three sites
+
+```{r}
+latest_conditions <- 
+  full_join(latest_airtemp, latest_precip) |> 
+  mutate(site = if_else(site == "Physics and Atmospheric Sciences", "Phys & Atm Sci", site)) |> 
+  ungroup()
+
+latest_conditions_icons <- 
+  latest_conditions |> 
+  select(-datetime) |> 
+  mutate(
+    air_temperature.value = paste("🌡️", air_temperature.value, "ºC"),
+    precipitation.value = paste("🌧️", precipitation.value, "mm")
+    ) 
+
+value_latest <- 
+  value_box(
+    "Current Conditions",
+    value = markdown(
+      knitr::kable(latest_conditions_icons, col.names = c("", "", ""), format = "pipe")
+      )
+  )
+
+value_latest
+
+```
+
+```{r}
+#| layout-ncol: 3
+#| column: screen-inset
+
+value_latest
+value_latest
+value_latest
+
+```
+
+This has good info, but it is way too big, IMO, and I can't figure out how to make it smaller.
+Plus, for something like soil temperature, I'm not sure how to summarize it
+
+```{r}
+#too many columns!
+latest_soiltemp <-   
+  data_full |> 
+  group_by(site, depth_height_m, basin) |> 
+  select(datetime, soil_temperature.value) |> 
+  filter(!is.na(soil_temperature.value)) |> 
+  filter(datetime == max(datetime)) |> 
+  arrange(site, depth_height_m)
+latest_soiltemp
+```
+
+Cumulative precip is a little more compact
+
+```{r}
+annual_precip <-
+  data_full |> 
+  group_by(site) |> 
+  filter(datetime >= floor_date(today(), "year")) |> 
+  dplyr::summarize(
+    cum_precip = sum(precipitation.value, na.rm = TRUE)
+  ) |> 
+  mutate(site = if_else(site == "Physics and Atmospheric Sciences", "Phys & Atm Sci", site)) |> 
+  mutate(cum_precip = paste(round(cum_precip, 0), "mm"))
+
+value_precip <- value_box(
+  glue::glue("Cumulative Precipitation ({year(Sys.Date())})"),
+  showcase = bs_icon("cloud-rain"),
+  value = markdown(
+    knitr::kable(annual_precip, col.names = c("", ""), format = "pipe")
+  )
+)
+value_precip
+```
+
+```{r}
+#| layout-ncol: 3
+#| column: screen-inset
+
+value_precip
+value_precip
+value_precip
+
+```
+
+Examples I see of value boxes generally just have a single value in them.
+What about something like "coolest site" or "wettest site"?
+
+```{r}
+coolest_site <-
+  latest_conditions |>
+  filter(air_temperature.value == min(air_temperature.value)) 
+
+value_coolest <-
+  value_box(
+    "Currently Coolest Site:",
+    showcase = bs_icon("thermometer"),
+    value = coolest_site$site,
+    p(paste(coolest_site$air_temperature.value, "ºC")),
+    p(paste("As of", format(coolest_site$datetime, "%a, %b %d %I:%M %p")))
+  )
+value_coolest
+
+```
