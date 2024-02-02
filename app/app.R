@@ -35,50 +35,50 @@ value_test <- value_box(
   fill = FALSE
 )
 
-last_rain <- data_full |> 
-  select(site, datetime, precipitation.value) |> 
-  filter(precipitation.value > 0) |> 
-  filter(datetime == max(datetime)) |> pull(datetime)
-days_since_last_rain <- (now() - last_rain) |> round() |> as.numeric()
-
-value_last_rain <- 
-  value_box(
-    "Last rainfall",
-    showcase = bs_icon("calendar"),
-    value = p(glue::glue("{days_since_last_rain} days ago")),
-    glue::glue("On {format(last_rain, '%a, %b %d')}")
-  )
-
-airtemp <- latest_conditions |> 
-  select(site, air_temperature.value) |> 
-  mutate(air_temperature.value = paste(air_temperature.value, "ºC"))
-latest_datetime <- format(max(latest_conditions$datetime), "%a, %b %d %I:%M %p")
-
-value_airtemp <- value_box(
-  glue::glue("{latest_datetime}"), #"hack" to remove <p> tag.  Probably a more correct way to do this
-  showcase = bs_icon("thermometer-half"),
-  value = markdown(
-    knitr::kable(airtemp, col.names = c("", ""), format = "pipe")
-  )
-)
-
-annual_precip <-
-  data_full |> 
-  group_by(site) |> 
-  filter(datetime >= floor_date(today(), "year")) |> 
-  dplyr::summarize(
-    cum_precip = sum(precipitation.value, na.rm = TRUE)
-  ) |> 
-  mutate(site = if_else(site == "Physics and Atmospheric Sciences", "Phys & Atm Sci", site)) |> 
-  mutate(cum_precip = paste(round(cum_precip, 0), "mm"))
-
-value_precip <- value_box(
-  glue::glue("Cumulative Precipitation ({year(Sys.Date())})"),
-  showcase = bs_icon("cloud-rain"),
-  value = markdown(
-    knitr::kable(annual_precip, col.names = c("", ""), format = "pipe")
-  )
-)
+# last_rain <- data_full |> 
+#   select(site, datetime, precipitation.value) |> 
+#   filter(precipitation.value > 0) |> 
+#   filter(datetime == max(datetime)) |> pull(datetime)
+# days_since_last_rain <- (now() - last_rain) |> round() |> as.numeric()
+# 
+# value_last_rain <- 
+#   value_box(
+#     "Last rainfall",
+#     showcase = bs_icon("calendar"),
+#     value = p(glue::glue("{days_since_last_rain} days ago")),
+#     glue::glue("On {format(last_rain, '%a, %b %d')}")
+#   )
+# 
+# airtemp <- latest_conditions |> 
+#   select(site, air_temperature.value) |> 
+#   mutate(air_temperature.value = paste(air_temperature.value, "ºC"))
+# latest_datetime <- format(max(latest_conditions$datetime), "%a, %b %d %I:%M %p")
+# 
+# value_airtemp <- value_box(
+#   glue::glue("{latest_datetime}"), #"hack" to remove <p> tag.  Probably a more correct way to do this
+#   showcase = bs_icon("thermometer-half"),
+#   value = markdown(
+#     knitr::kable(airtemp, col.names = c("", ""), format = "pipe")
+#   )
+# )
+# 
+# annual_precip <-
+#   data_full |> 
+#   group_by(site) |> 
+#   filter(datetime >= floor_date(today(), "year")) |> 
+#   dplyr::summarize(
+#     cum_precip = sum(precipitation.value, na.rm = TRUE)
+#   ) |> 
+#   mutate(site = if_else(site == "Physics and Atmospheric Sciences", "Phys & Atm Sci", site)) |> 
+#   mutate(cum_precip = paste(round(cum_precip, 0), "mm"))
+# 
+# value_precip <- value_box(
+#   glue::glue("Cumulative Precipitation ({year(Sys.Date())})"),
+#   showcase = bs_icon("cloud-rain"),
+#   value = markdown(
+#     knitr::kable(annual_precip, col.names = c("", ""), format = "pipe")
+#   )
+# )
 
 # UI ----------------------------------------------------------------------
 ui <- page_navbar(
@@ -143,13 +143,13 @@ ui <- page_navbar(
       heights_equal = "all",
       fill = FALSE,
       # fillable = FALSE,
-      value_airtemp,
-      value_precip,
-      value_last_rain,
+      value_test,
+      value_test,
+      value_test,
     ),
     card(
       includeMarkdown("about.md"),
-      fill = FALSE #change this to TRUE to have the row of value boxes "frozen" to the top
+      fill = TRUE #change this to TRUE to have the row of value boxes "frozen" to the top
     )
   ),
   nav_spacer(),
