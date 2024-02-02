@@ -23,11 +23,19 @@ data_full <-
   right_join(site_info) |> 
   mutate(datetime = with_tz(datetime, "America/Phoenix"))
 
+# legend <- make_legend(unique(data_full$site))
+theme <- bs_theme(preset = "shiny")
 
+value_test <- value_box(
+  title = "Hello!", 
+  showcase = bs_icon("calendar"),
+  value = "20 ºC",
+  "is the temperature"
+)
 
 # UI ----------------------------------------------------------------------
 ui <- page_navbar(
-  theme = bs_theme() |>  bs_theme_update(),
+  theme = bs_theme_update(theme, primary = "#81D3EB", font_scale = 1.2),
   title = "GSI Living Lab", 
   id = "navbar",
   # fillable = FALSE, # make scrollable.  Try with and without this
@@ -85,13 +93,13 @@ ui <- page_navbar(
     "About",
     layout_column_wrap(
       width = 1/3,
-      value_latest,
-      value_latest,
-      value_latest
+      value_test,
+      value_test,
+      value_test
+    ),
+    card(
+      includeMarkdown("about.md"),
     )
-    # card(
-    #   includeMarkdown("about.md"),
-    # )
   ),
   nav_panel(
     "Atmospheric",
@@ -135,7 +143,7 @@ ui <- page_navbar(
 # Server ------------------------------------------------------------------
 
 server <- function(input, output, session) {
-  bs_themer() #temporary! Remove before deploying
+  # bs_themer() #temporary! Remove before deploying
 
 
   ## Open sidebar on other tabs --------------------------------------------
@@ -151,7 +159,6 @@ server <- function(input, output, session) {
   
   
   ## Get filtered data -----------------------------------------------------
-  
   data_filtered_atm <- reactive({
     data_full |> 
       filter(site %in% input$site) |> 
