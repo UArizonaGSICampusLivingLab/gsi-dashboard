@@ -152,7 +152,6 @@ ui <- page_navbar(
       fill = TRUE #change this to TRUE to have the row of value boxes "frozen" to the top
     )
   ),
-  nav_spacer(),
   nav_panel(
     "Atmospheric",
     htmlOutput("legend1"),
