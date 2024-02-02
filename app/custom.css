@@ -1,0 +1,4 @@
+/* Reduce font size of tables inside value boxes */
+.bslib-value-box .value-box-area table {
+  font-size: 1rem !important;
+}
