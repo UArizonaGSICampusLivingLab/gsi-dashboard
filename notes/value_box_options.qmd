@@ -4,6 +4,8 @@ format:
   html:
     code-fold: true
     html-table-processing: none
+    toc: true
+    theme: custom.scss
 editor: visual
 execute: 
   warning: false
@@ -22,10 +24,10 @@ library(shiny)
 library(glue)
 library(knitr)
 source(here("app/R/gsi_get_data.R"))
+source(here("app/R/0-theme_gsi.R"))
 ```
 
-In this document I test out a few options for value boxes.
-For each one I present them singly, and as a 3-column layout taking the full width of the browser.
+This document has some options for value boxes that could appear in a row on the landing page for the dashboard.
 
 ```{r}
 #| include: false
@@ -69,7 +71,7 @@ latest_soiltemp <-
 
 ```
 
-Latest conditions in all three sites
+## Latest conditions in all three sites
 
 ```{r}
 latest_conditions <- 
@@ -84,10 +86,11 @@ latest_conditions_icons <-
     air_temperature.value = paste("🌡️", air_temperature.value, "ºC"),
     precipitation.value = paste("🌧️", precipitation.value, "mm")
     ) 
+#weird hack: if one element is <p> then the other element is large.  But if neither element is <p>, both title and value are small.  glue::glue() seems to make the title not <p>?
 
 value_latest <- 
   value_box(
-    "Current Conditions",
+    glue::glue("Current Conditions"), 
     value = markdown(
       knitr::kable(latest_conditions_icons, col.names = c("", "", ""), format = "pipe")
       )
@@ -97,30 +100,23 @@ value_latest
 
 ```
 
+Column layout:
+
+::: {layout-ncol="2"}
 ```{r}
-#| layout-ncol: 3
-#| column: screen-inset
-
+#| echo: false
 value_latest
-value_latest
-value_latest
-
 ```
-
-This has good info, but it is way too big, IMO, and I can't figure out how to make it smaller.
-Plus, for something like soil temperature, I'm not sure how to summarize it
-
 ```{r}
-#too many columns!
-latest_soiltemp <-   
-  data_full |> 
-  group_by(site, depth_height_m, basin) |> 
-  select(datetime, soil_temperature.value) |> 
-  filter(!is.na(soil_temperature.value)) |> 
-  filter(datetime == max(datetime)) |> 
-  arrange(site, depth_height_m)
-latest_soiltemp
+#| echo: false
+value_latest
 ```
+:::
+
+
+This has good info, but in my opinion it's too much. I have to rely on a "hack" to keep the table small enough to fit in the box, and I think the font size is a bit small for a value box as a result.
+
+## Cumulative Precip.
 
 Cumulative precip is a little more compact
 
@@ -145,15 +141,72 @@ value_precip <- value_box(
 value_precip
 ```
 
+Column layout:
+
+::: {layout-ncol="2"}
 ```{r}
-#| layout-ncol: 3
-#| column: screen-inset
-
+#| echo: false 
 value_precip
-value_precip
-value_precip
-
 ```
+
+```{r}
+#| echo: false
+value_precip
+```
+:::
+
+## Current Air Temp.
+
+And we can do just most recent temperature in a similar way
+
+```{r}
+airtemp <- latest_conditions |> 
+  select(site, air_temperature.value) |> 
+  mutate(air_temperature.value = paste(air_temperature.value, "ºC"))
+latest_datetime <- format(max(latest_conditions$datetime), "%a, %b %d %I:%M %p")
+
+value_airtemp <- value_box(
+  glue::glue("{latest_datetime}"), #"hack" to remove <p> tag.  Probably a more correct way to do this
+  showcase = bs_icon("thermometer-half"),
+  value = markdown(
+    knitr::kable(airtemp, col.names = c("", ""), format = "pipe")
+  )
+)
+value_airtemp
+```
+Column layout:
+
+::: {layout-ncol="2"}
+
+```{r}
+#| echo: false
+value_airtemp
+```
+
+```{r}
+#| echo: false
+value_airtemp
+```
+
+:::
+
+## Soil temperature
+
+I'm not sure how to summarize it!  There's too many measurments
+
+```{r}
+#too many columns!
+latest_soiltemp <-   
+  data_full |> 
+  group_by(site, depth_height_m, basin) |> 
+  select(datetime, soil_temperature.value) |> 
+  filter(!is.na(soil_temperature.value)) |> 
+  filter(datetime == max(datetime)) |> 
+  arrange(site, depth_height_m)
+latest_soiltemp
+```
+
+## Single value ideas
 
 Examples I see of value boxes generally just have a single value in them.
 What about something like "coolest site" or "wettest site"?
@@ -165,7 +218,7 @@ coolest_site <-
 
 value_coolest <-
   value_box(
-    "Currently Coolest Site:",
+    "Coolest Site",
     showcase = bs_icon("thermometer"),
     value = coolest_site$site,
     p(paste(coolest_site$air_temperature.value, "ºC")),
@@ -174,3 +227,87 @@ value_coolest <-
 value_coolest
 
 ```
+
+::: {layout-ncol="2"}
+```{r}
+#| echo: false
+value_coolest
+```
+```{r}
+#| echo: false
+value_coolest
+```
+:::
+
+Days since rain?
+
+```{r}
+last_rain <- data_full |> 
+  select(site, datetime, precipitation.value) |> 
+  filter(precipitation.value > 0) |> 
+  filter(datetime == max(datetime)) |> pull(datetime)
+days_since_last_rain <- (now() - last_rain) |> round() |> as.numeric()
+
+value_last_rain <- 
+  value_box(
+    "Last rainfall",
+    showcase = bs_icon("calendar"),
+    value = p(glue::glue("{days_since_last_rain} days ago")),
+    glue::glue("On {format(last_rain, '%a, %b %d')}")
+  )
+value_last_rain
+```
+
+Column layout:
+
+::: {layout-ncol="2"}
+```{r}
+#| echo: false
+value_last_rain
+```
+```{r}
+#| echo: false
+value_last_rain
+```
+:::
+
+## Mix value boxes
+
+What does it look like with two different boxes side-by-side?
+
+::: {layout-ncol="2"}
+```{r}
+#| echo: false
+value_airtemp
+```
+```{r}
+#| echo: false
+value_precip
+```
+:::
+
+
+::: {layout-ncol="2"}
+```{r}
+#| echo: false
+value_airtemp
+```
+```{r}
+#| echo: false
+value_coolest
+```
+:::
+
+::: {layout-ncol="2"}
+```{r}
+#| echo: false
+value_last_rain
+```
+```{r}
+#| echo: false
+value_coolest
+```
+:::
+
+
+They aren't "automatically" expanded to the same size, would need to set `height` in `value_box()` I think.
