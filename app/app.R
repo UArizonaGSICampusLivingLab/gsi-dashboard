@@ -10,6 +10,7 @@ library(boxr)
 library(glue)
 library(Hmisc)
 library(knitr)
+library(markdown)
 
 # Create theme
 theme <- bs_theme(preset = "shiny")

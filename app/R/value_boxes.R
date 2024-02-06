@@ -1,9 +1,9 @@
-# functions to make value boxes.  All of these start with data_full that is created at the top of app.R
+#functions to make value boxes.  All of these start with data_full that is created at the top of app.R
 #for testing purposes:
 # site_info <- read_csv(here("app/data/site_info.csv"))
-# data_full <- 
-#   read_csv(here("app/data/gsi_living_lab_data.csv")) |> 
-#   right_join(site_info) |> 
+# data_full <-
+#   read_csv(here("app/data/gsi_living_lab_data.csv")) |>
+#   right_join(site_info) |>
 #   mutate(datetime = with_tz(datetime, "America/Phoenix"))
 
 
@@ -26,6 +26,7 @@ make_value_latest <- function(data_full) {
     select(datetime, air_temperature.value) |> 
     filter(!is.na(air_temperature.value)) |> 
     filter(datetime == max(datetime)) |> 
+    slice(1)|>
     ungroup()
   
   latest_precip <-
@@ -34,6 +35,7 @@ make_value_latest <- function(data_full) {
     select(datetime, precipitation.value) |> 
     filter(!is.na(precipitation.value)) |> 
     filter(datetime == max(datetime)) |> 
+    slice(1)|>
     ungroup()
   
   latest_conditions <- 
@@ -52,7 +54,7 @@ make_value_latest <- function(data_full) {
     )
   )
 }
-# make_value_latest(data_full)
+#make_value_latest(data_full)
 
 # Cumulative precip since Jan 1 of current year
 make_value_precip <- function(data_full) {

@@ -2,8 +2,7 @@
 
 ## Green Storm Water Infrastructure Project
 
-Welcome to the *dashboard* for the **University** of Arizona [Green Storm Water Infrastructure Project](https://udallcenter.arizona.edu/news/campus-living-lab-creating-more-sustainable-campus-designing-building-and-monitoring-green)!
-(More information)
+Welcome to the *dashboard* for the **University** of Arizona [Green Storm Water Infrastructure Project](https://udallcenter.arizona.edu/news/campus-living-lab-creating-more-sustainable-campus-designing-building-and-monitoring-green)! (More information)
 
 It looks like this:
 
