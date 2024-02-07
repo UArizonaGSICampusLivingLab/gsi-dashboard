@@ -104,3 +104,4 @@ make_value_lastrain <- function(data_full) {
 }
 
 # make_value_lastrain(data_full)
+
