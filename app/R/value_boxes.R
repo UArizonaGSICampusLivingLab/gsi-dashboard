@@ -9,10 +9,10 @@
 
 make_value_test <- function() {
   value_box(
-    title = "Hello!", 
-    showcase = bs_icon("calendar"),
+    title = "Comfortability", 
+    showcase = bs_icon("person"),
     value = "20 ºC",
-    "is the temperature",
+    "is the perceivied temperature",
     fill = FALSE
   )
 }
@@ -48,7 +48,7 @@ make_value_latest <- function(data_full) {
   # construct value box
   value_box(
     glue::glue("Current Conditions"), 
-    showcase = bs_icon("calendar"),
+    showcase = bs_icon("thermometer"),
     value = markdown(
       knitr::kable(latest_conditions |> select(-datetime), col.names = c("", "🌡", "🌧️"), format = "pipe")
     )

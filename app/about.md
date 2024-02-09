@@ -6,13 +6,13 @@ Welcome to the dashboard for the University of Arizona [Campus Living Lab](http:
 
 This innovative campus initiative was designed to transform our green stormwater infrastructure (GSI) features located across campus into an interactive learning environment for students, researchers, and partners from various disciplines.
 
-![Photo Credit: Ryan Hunt, BIO5 Institute](CampusLivingLab(12-01-23)-0185.jpg){width="640"}
+![Photo Credit: Ryan Hunt, BIO5 Institute](CampusLivingLab(12-01-23)-0185.jpg){style="text-align: center;" width="662"}
 
-### Chase the Rain
+### Chase the Rain {style="text-align: center;"}
 
 Visit our three sites on campus: Old Main, Gould Simpson, and Physics and Atmospheric Sciences. These sites represent various green stormwater infrastructure designs to capture and water plants. Old Main represents a native xeroscape rain garden with the primary water source being rooftop runoff. Gould Simpson is a Resilience Garden sponsored by the University of Arizona Arboretum featuring legume trees that receives water from two rooftops and surrounding hardscapes. Physics and Atmospheric Sciences features a classic southwest landscape slight grading for stormwater collection and desert vegetation. For more information, visit the [Campus Living Lab](http://gicampuslivinglab.arizona.edu/) website.
 
-### Go With the Flow!
+### Go With the Flow {style="text-align: center;"}
 
 In the Atmosphere tab you'll find figures for:
 
@@ -30,4 +30,4 @@ In the Environmental Plots tab you'll find figures for:
 
 (coming soon!)
 
-![](CampusLivingLab-0386.jpg){width="641"}
+![](CampusLivingLab-0386.jpg){width="665"}
