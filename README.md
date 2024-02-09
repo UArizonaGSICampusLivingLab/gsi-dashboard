@@ -12,12 +12,14 @@
 
 ![](flowchart.png)
 
-The [gsi-wranging-workflow](https://github.com/UArizonaGSICampusLivingLab/gsi-wrangling-workflow) repository houses `gsi_wrangling.Rmd` which is published to Posit Connect as a scheduled workflow running daily at noon.
+The [gsi-wrangling-workflow](https://github.com/UArizonaGSICampusLivingLab/gsi-wrangling-workflow) repository houses `gsi_wrangling.Rmd` which is published to Posit Connect as a scheduled workflow running daily at noon.
 This .Rmd file contains code to pull the most recent data for the Campus Living Lab sites from [ZentraCloud](https://zentracloud.com/), wrangle the data, and append it to a .csv file stored on Box.
 The gsi-dashboard repository (this one) contains code for a [Shiny](https://shiny.posit.co/) app that is automatically deployed to Posit Connect (using GitHub Actions) when updates are made to the main branch.
 This Shiny app reads in the data from Box on start-up and provides interactive visualizations of the data.
 
 ## Contributing
+
+To get this app working locally, you will need to create a .Renviron file with the environment variable `BOX_TOKEN_TEXT` with the contents of a authorization token for a the Box service app used to read data in from Box.
 
 To contribute to this project, please create a new branch for your changes and make a pull request.
 One easy way to do this from within R is with the `usethis` package and the `pr_*` functions.
