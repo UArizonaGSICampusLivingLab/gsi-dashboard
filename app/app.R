@@ -22,7 +22,11 @@ data_full <-
   read_csv("data/gsi_living_lab_data.csv") |> 
   right_join(site_info) |> 
   mutate(datetime = with_tz(datetime, "America/Phoenix"))
-# legend <- make_legend(unique(data_full$site))
+
+data_et <-
+  read_csv("data/gsi_living_lab_ETo.csv") |> 
+  left_join(site_info)
+
 theme <- bs_theme(preset = "shiny")
 
 # UI ----------------------------------------------------------------------
@@ -45,7 +49,7 @@ ui <- page_navbar(
     conditionalPanel(
       "input.navbar == 'Atmospheric'",
       airDatepickerInput(
-        inputId = "daterange",
+        inputId = "daterange_atm",
         label = "Date Range",
         range = TRUE,
         # Default date range
@@ -74,6 +78,21 @@ ui <- page_navbar(
         minDate = "2023-06-05",
         view = "months",
         minView = "months",
+        addon = "none",
+        update_on = "close"
+      )
+    ),
+    conditionalPanel(
+      "input.navbar == 'Environmental'",
+      airDatepickerInput(
+        inputId = "daterange_et",
+        label = "Date Range",
+        range = TRUE,
+        # Default date range
+        value = c(Sys.Date() - 7, Sys.Date()),
+        dateFormat = "MM/dd/yy",
+        maxDate = Sys.Date(),
+        minDate = "2024-01-06",
         addon = "none",
         update_on = "close"
       )
@@ -112,8 +131,12 @@ ui <- page_navbar(
     )
   ),
   nav_panel(
-    "Environmental Plots",
+    "Environmental",
     htmlOutput("legend3"),
+    card(
+      full_screen = TRUE,
+      plotOutput("plot_et")
+    )
   ),
   
   # nav_panel(
@@ -136,13 +159,19 @@ server <- function(input, output, session) {
   data_filtered_atm <- reactive({
     data_full |> 
       filter(site %in% input$site) |> 
-      filter(datetime >= input$daterange[1], datetime <= input$daterange[2])
+      filter(datetime >= input$daterange_atm[1], datetime <= input$daterange_atm[2])
   })
   data_filtered_soil <- reactive({
     data_full |> 
       filter(site %in% input$site) |> 
       filter(datetime >= input$monthrange[1], datetime <= input$monthrange[2])
   })
+  data_filtered_et <- reactive({
+    data_et |> 
+      filter(site %in% input$site) |> 
+      filter(datetime >= input$daterange_et[1], datetime <= input$daterange_et[2])
+  })
+  
   ## Legend -------
   #can't re-use output objects, so make one for each tab
   output$legend1 <- output$legend2 <- output$legend3 <- renderUI({
@@ -175,6 +204,10 @@ server <- function(input, output, session) {
   output$plot_soil_matric <- renderPlot({
     gsi_plot_soil(data_filtered_soil(), yvar = "matric_potential.value") +
       labs(y = "Matric Potential (kPa)")
+  })
+  
+  output$plot_et <- renderPlot({
+    gsi_plot_et(data_filtered_et())
   })
   
   ##  Value boxes -------
