@@ -12,7 +12,7 @@ gsi_plot_airtemp <- function(data, daily = FALSE) {
   if (isTRUE(daily)) {
     data_atm <- 
       data_atm |> 
-      mutate(date = floor_date(datetime, "day")) |> #TODO BUG: last day always has range of 0º
+      mutate(date = floor_date(datetime, "day")) |>
       dplyr::summarize(
         airtemp_mean = mean(air_temperature.value, na.rm = TRUE),
         airtemp_low = min(air_temperature.value, na.rm = TRUE),
