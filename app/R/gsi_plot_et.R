@@ -8,6 +8,5 @@ gsi_plot_et <- function(data_et) {
     scale_x_date(expand = c(0,0)) +
     scale_color_manual(values = gsi_site_colors, aesthetics = c("fill", "color")) + #defined in 0-theme_gsi.R
     guides(color = "none", fill = "none") + #turn off legend
-    labs(y = "Air Temp. (ºC)") +
     theme(axis.title.x = element_blank(), axis.title.y = element_markdown())
 }
