@@ -90,7 +90,11 @@ ui <- page_navbar(
     "About",
     div(
       img(src = "testimage.png", align = "center", style = "width: 100%"),
-      div(h1("Campus Living Lab"), class = "centered"),
+      div(
+        h2("Campus Living Lab"),
+        h3("Green Stormwater Infrastructure"),
+        class = "centered"
+      ),
       class = "container"
     ),
     layout_column_wrap(
