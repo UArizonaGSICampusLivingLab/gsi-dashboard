@@ -19,8 +19,8 @@ theme <- bs_theme(preset = "shiny")
 site_info <- read_csv("data/site_info.csv")
 
 # # Download most recent data from Box
-box_auth_service(token_text = Sys.getenv("BOX_TOKEN_TEXT"))
-gsi_get_data()
+# box_auth_service(token_text = Sys.getenv("BOX_TOKEN_TEXT"))
+# gsi_get_data()
 
 # Read in data and join with site info
 data_full <- 
@@ -88,7 +88,11 @@ ui <- page_navbar(
   ),
   nav_panel(
     "About",
-    img(src = "testimage.png", align = "center"),
+    div(
+      img(src = "testimage.png", align = "center", style = "width: 100%"),
+      div(h1("Campus Living Lab"), class = "centered"),
+      class = "container"
+    ),
     layout_column_wrap(
       width = 1/3,
       heights_equal = "all",
