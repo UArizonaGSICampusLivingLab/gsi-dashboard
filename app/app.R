@@ -88,6 +88,7 @@ ui <- page_navbar(
   ),
   nav_panel(
     "About",
+    img(src = "testimage.png", align = "center"),
     layout_column_wrap(
       width = 1/3,
       heights_equal = "all",
@@ -98,7 +99,7 @@ ui <- page_navbar(
     ),
     card(
       includeMarkdown("about.md"),
-      fill = TRUE #change this to TRUE to have the row of value boxes "frozen" to the top
+      fill = FALSE #change this to TRUE to have the row of value boxes "frozen" to the top
     )
   ),
   nav_panel(
