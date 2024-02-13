@@ -136,12 +136,14 @@ server <- function(input, output, session) {
   data_filtered_atm <- reactive({
     data_full |> 
       filter(site %in% input$site) |> 
-      filter(datetime >= input$daterange[1], datetime <= input$daterange[2])
+      filter(date(datetime) >= input$daterange[1],
+             date(datetime) <= input$daterange[2])
   })
   data_filtered_soil <- reactive({
     data_full |> 
       filter(site %in% input$site) |> 
-      filter(datetime >= input$monthrange[1], datetime <= input$monthrange[2])
+      filter(date(datetime) >= input$monthrange[1],
+             date(datetime) <= input$monthrange[2])
   })
   ## Legend -------
   #can't re-use output objects, so make one for each tab
