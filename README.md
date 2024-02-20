@@ -8,6 +8,10 @@
 
 <!-- About this dashboard.  To be filled out by Malcolm and Vanessa -->
 
+## About This Dashboard
+
+The GSI Living Lab dashboard displays micro meteorological data for three GSI features at the University of Arizona. Environmental variables include temperature, relative humidity, and precipitation.Soil moisture and temperature data are also collected at each site and displayed on the dashboard. Environmental models of plant available water, evapotranspiration, and human perceived temperature using heat index and wind chill factors. [gsi-dashboard](https://viz.datascience.arizona.edu/gsi-dashboard/)
+
 ## How does it work?
 
 ![](flowchart.png)
