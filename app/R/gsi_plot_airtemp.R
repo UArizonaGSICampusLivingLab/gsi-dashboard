@@ -12,7 +12,7 @@ gsi_plot_airtemp <- function(data, daily = FALSE) {
   if (isTRUE(daily)) {
     data_atm <- 
       data_atm |> 
-      mutate(date = floor_date(datetime, "day")) |> 
+      mutate(date = floor_date(datetime, "day")) |>
       dplyr::summarize(
         airtemp_mean = mean(air_temperature.value, na.rm = TRUE),
         airtemp_low = min(air_temperature.value, na.rm = TRUE),
@@ -49,6 +49,7 @@ gsi_plot_airtemp <- function(data, daily = FALSE) {
   # ggplotly(p)
   p
 }
+
 #need something like this, but this doesn't work for unknown reasons:
 # data_full |> 
 #   filter(site == "Physics and Atmospheric Sciences") |> 
@@ -60,3 +61,4 @@ gsi_plot_airtemp <- function(data, daily = FALSE) {
 #     ymax = ~airtemp_high,
 #     connectgaps = TRUE
 #   )
+
