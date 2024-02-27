@@ -58,7 +58,11 @@ ui <- page_navbar(
       ),
       conditionalPanel(
         "input.navbar == 'Atmospheric'",
-        input_switch("daily", "Daily Summary")
+        input_switch("daily", span(
+          "Daily",
+          tooltip(bs_icon("info-circle"),
+                  "Display temperature and RH are as mean ± range and precipitaiton as daily totals.")
+        ))
       )
     ),
     conditionalPanel(
