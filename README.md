@@ -2,15 +2,17 @@
 
 <!-- badges: start -->
 
-[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip) [![deploy-to-connect](https://github.com/UArizonaGSICampusLivingLab/gsi-dashboard/actions/workflows/deploy-connect.yaml/badge.svg)](https://github.com/UArizonaGSICampusLivingLab/gsi-dashboard/actions/workflows/deploy-connect.yaml)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active) [![deploy-to-connect](https://github.com/UArizonaGSICampusLivingLab/gsi-dashboard/actions/workflows/deploy-connect.yaml/badge.svg)](https://github.com/UArizonaGSICampusLivingLab/gsi-dashboard/actions/workflows/deploy-connect.yaml)
 
 <!-- badges: end -->
 
-<!-- About this dashboard.  To be filled out by Malcolm and Vanessa -->
-
 ## About This Dashboard
 
-The GSI Living Lab dashboard displays micro meteorological data for three GSI features at the University of Arizona. Environmental variables include temperature, relative humidity, and precipitation.Soil moisture and temperature data are also collected at each site and displayed on the dashboard. Environmental models of plant available water, evapotranspiration, and human perceived temperature using heat index and wind chill factors. [gsi-dashboard](https://viz.datascience.arizona.edu/gsi-dashboard/)
+The GSI Living Lab dashboard displays micro meteorological data for three GSI features at the University of Arizona.
+Environmental variables include temperature, relative humidity, and precipitation.
+Soil moisture and temperature data are also collected at each site and displayed on the dashboard.
+Environmental models of plant available water, evapotranspiration, and human perceived temperature using heat index and wind chill factors.
+[gsi-dashboard](https://viz.datascience.arizona.edu/gsi-dashboard/)
 
 ## How does it work?
 

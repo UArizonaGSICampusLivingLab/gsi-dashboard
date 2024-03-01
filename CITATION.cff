@@ -1,0 +1,54 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: >-
+  Campus Living Lab Green Stormwater Infrastructure
+  Dashboard
+message: >-
+  To cite the code for this dashboard, please use the
+  metadata in this file.  To cite the data, see the citation
+  information in the data request form <https://forms.gle/63qWCybhvHaHunuH6>
+type: software
+version: 0.0.1
+authors:
+  - given-names: Eric R
+    family-names: Scott
+    orcid: 'https://orcid.org/0000-0002-7430-7879'
+    affiliation: >-
+      Communications & Cyber Technologies, Arizona
+      Experiment Station, University of Arizona
+    email: ericrscott@arizona.edu
+  - given-names: Malcolm Javier
+    family-names: Barrios
+    affiliation: 'College of Engineering, University of Arizona'
+  - given-names: Kristina
+    family-names: Riemer
+    orcid: 'https://orcid.org/0000-0003-3802-3331'
+    affiliation: >-
+      Communications & Cyber Technologies, Arizona
+      Experiment Station, University of Arizona
+  - given-names: Vanessa
+    family-names: Buzzard
+    affiliation: >-
+      School of Natural Resources and the Environment,
+      University of Arizona
+    orcid: 'https://orcid.org/0000-0003-2929-0833'
+repository-code: >-
+  https://github.com/UArizonaGSICampusLivingLab/gsi-dashboard
+url: 'https://viz.datascience.arizona.edu/gsi-dashboard/'
+abstract: >-
+  The GSI Living Lab dashboard displays micro meteorological
+  data for three GSI features at the University of Arizona.
+  Environmental variables include temperature, relative
+  humidity, and precipitation. Soil moisture and temperature
+  data are also collected at each site and displayed on the
+  dashboard. Environmental models of plant available water,
+  evapotranspiration, and human perceived temperature using
+  heat index and wind chill factors.
+keywords:
+  - microclimate
+  - dashboard
+  - shiny app
+  - meteorology
+license: MIT
