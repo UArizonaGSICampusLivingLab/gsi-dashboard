@@ -57,3 +57,10 @@ The theme for all of the `ggplot2` plots in the dashboard is controlled by `R/0-
 
 This app is published to <https://viz.datascience.arizona.edu/gsi-dashboard/> automatically by a GitHub action whenever changes are made to the main branch of this repository.
 If changes are not being reflected on the deployed app or there are other issues with the live app, please contact \@cct-datascience.
+
+## Citation
+
+If you use this code, please cite as follows:
+
+> Scott, E. R., Barrios, M. J., Riemer, K., & Buzzard, V. Campus Living Lab Green Stormwater Infrastructure Dashboard (Version 0.1.0) [Computer software].
+> <https://doi.org/10.5281/zenodo.10736077>
