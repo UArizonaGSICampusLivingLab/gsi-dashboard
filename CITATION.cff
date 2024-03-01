@@ -10,7 +10,7 @@ message: >-
   metadata in this file.  To cite the data, see the citation
   information in the data request form <https://forms.gle/63qWCybhvHaHunuH6>
 type: software
-version: 0.0.1
+version: 0.1.0 #update this before making a release
 authors:
   - given-names: Eric R
     family-names: Scott
@@ -46,6 +46,7 @@ abstract: >-
   dashboard. Environmental models of plant available water,
   evapotranspiration, and human perceived temperature using
   heat index and wind chill factors.
+doi: '10.5281/zenodo.10736077'
 keywords:
   - microclimate
   - dashboard

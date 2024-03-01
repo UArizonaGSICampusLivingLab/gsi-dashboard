@@ -2,7 +2,7 @@
 
 <!-- badges: start -->
 
-[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active) [![deploy-to-connect](https://github.com/UArizonaGSICampusLivingLab/gsi-dashboard/actions/workflows/deploy-connect.yaml/badge.svg)](https://github.com/UArizonaGSICampusLivingLab/gsi-dashboard/actions/workflows/deploy-connect.yaml)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active) [![deploy-to-connect](https://github.com/UArizonaGSICampusLivingLab/gsi-dashboard/actions/workflows/deploy-connect.yaml/badge.svg)](https://github.com/UArizonaGSICampusLivingLab/gsi-dashboard/actions/workflows/deploy-connect.yaml) [![DOI](https://zenodo.org/badge/705681364.svg)](https://zenodo.org/doi/10.5281/zenodo.10736077)
 
 <!-- badges: end -->
 
