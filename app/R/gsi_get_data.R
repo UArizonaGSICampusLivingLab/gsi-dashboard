@@ -11,7 +11,7 @@ gsi_get_data <- function(path = "data", overwrite = TRUE) {
   dir_create(path)
   box_ls() |>
     as_tibble() |> 
-    filter(name %in% c("gsi_living_lab_data.csv", "gsi_living_lab_ETo.csv")) |> 
+    filter(name %in% c("gsi_living_lab_data.csv", "gsi_living_lab_ETo.csv", "site_info.csv")) |> 
     pull(id) |> 
     map(\(x) {
       box_dl(x, local_dir = path, overwrite = overwrite)
