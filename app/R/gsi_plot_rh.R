@@ -3,7 +3,7 @@ library(ggplot2)
 
 #' `data`: the dataset already filtered to a single site and a date range
 #' `daily`: display a daily summary instead of hourly data
-gsi_plot_vpd <- function(data, daily = FALSE) {
+gsi_plot_rh <- function(data, daily = FALSE) {
   #use just atmospheric sensor data for this plot
   data_atm <- 
     data |> 
@@ -14,25 +14,33 @@ gsi_plot_vpd <- function(data, daily = FALSE) {
       data_atm |> 
       mutate(datetime = floor_date(datetime, "day")) |> 
       dplyr::summarize(
-        across(c(vapor_pressure.value, vpd.value), \(x) mean(x, na.rm = TRUE)),
+        rh_mean = mean(relative_humidity.value, na.rm = TRUE),
+        rh_min = min(relative_humidity.value, na.rm = TRUE),
+        rh_max = max(relative_humidity.value, na.rm = TRUE),
         .by = c(site, datetime)
       ) |> 
       #because mean(c(NA, NA, NA), na.rm = TRUE) results in Inf, we need to replace these with regular NAs for better plotting
-      mutate(across(c(vapor_pressure.value, vpd.value), \(x) if_else(!is.finite(x), NA, x)))
+      mutate(across(starts_with("rh_"), \(x) if_else(!is.finite(x), NA, x)))
+    
+    p <- 
+      ggplot(data_atm, aes(x = datetime)) +
+      geom_line(aes(y = rh_mean, color = site), linewidth = 1) +
+      geom_ribbon(aes(ymin = rh_min, ymax = rh_max, fill = site), alpha = 0.2)
+  } else {
+    p <- 
+      ggplot(data_atm, aes(x = datetime, color = site)) +
+      geom_line(aes(y = relative_humidity.value), linewidth = 1, alpha = 0.75, na.rm = TRUE)
+    
   }
   
-  ggplot(data_atm, aes(x = datetime, color = site)) +
-    #rather than map color to a column in the data or set it manually, we do a
-    #third thing—set it to a character string *inside* of aes().  This is a
-    #"trick" for creating a color legend
-    geom_line(aes(y = vapor_pressure.value, linetype = "VP"), linewidth = 0.65, alpha = 0.5, na.rm = TRUE) +
-    geom_line(aes(y = vpd.value, linetype = "VPD"), linewidth = 0.65, alpha = 0.5, na.rm = TRUE) +
+  p +
     #this makes the line go all the way to the edge of the plot.  I like this for timeseries
     scale_x_datetime(expand = c(0,0)) +
-    scale_color_manual(values = gsi_site_colors) + #defined in 0-theme_gsi.R
-    guides(color = "none") + #turn off legend
+    scale_y_continuous(labels = scales::label_percent()) +
+    scale_color_manual(values = gsi_site_colors, aesthetics = c("fill", "color")) + #defined in 0-theme_gsi.R
+    guides(color = "none", fill = "none") + #turn off legend
     theme(axis.title.x = element_blank(), legend.position = "top") +
-    labs(y = "Vapor Pressure / VPD (kPa)")
+    labs(y = "Relative Humidity")
 }
 
 
@@ -44,4 +52,4 @@ gsi_plot_vpd <- function(data, daily = FALSE) {
 # data_filtered <-
 #   data_full |>
 #   filter(site == "Old Main", datetime > "2023-11-01", datetime < "2023-11-15")
-# gsi_plot_vpd(data_filtered)
+# gsi_plot_rh(data_filtered)
