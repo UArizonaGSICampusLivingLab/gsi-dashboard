@@ -62,7 +62,11 @@ ui <- page_navbar(
       ),
       conditionalPanel(
         "input.navbar == 'Atmospheric'",
-        input_switch("daily", "Daily Summary")
+        input_switch("daily", span(
+          "Daily",
+          tooltip(bs_icon("info-circle"),
+                  "Display temperature and RH are as mean ± range and precipitaiton as daily totals.")
+        ))
       )
     ),
     conditionalPanel(
@@ -111,7 +115,7 @@ ui <- page_navbar(
     ),
     card(
       full_screen = TRUE,
-      plotOutput("plot_vp")
+      plotOutput("plot_rh")
     )
   ),
   nav_panel(
@@ -189,8 +193,8 @@ server <- function(input, output, session) {
     gsi_plot_precip(data_filtered_atm(), daily = input$daily)
   })
   
-  output$plot_vp <- renderPlot({
-    gsi_plot_vpd(data_filtered_atm(), daily = input$daily)
+  output$plot_rh <- renderPlot({
+    gsi_plot_rh(data_filtered_atm(), daily = input$daily)
   })
   
   output$plot_soil_temp <- renderPlot({

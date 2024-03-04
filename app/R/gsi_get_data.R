@@ -5,7 +5,7 @@ library(fs)
 
 
 gsi_get_data <- function(path = "data", overwrite = TRUE) {
-  dir_id <- "233031886906"
+  dir_id <- "250527085917"
   box_setwd(dir_id)
   #create path if it doesn't exist
   dir_create(path)
