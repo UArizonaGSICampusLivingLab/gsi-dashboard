@@ -138,14 +138,17 @@ ui <- page_navbar(
     "Environmental",
     htmlOutput("legend3"),
     card(
+      #TODO add an info/help tooltip explaining what this is
       full_screen = TRUE,
       plotOutput("plot_temp_adj")
     ),
     card(
+      #TODO add an info/help tooltip explaining how this is calculated
       full_screen = TRUE,
       plotOutput("plot_paw")
     ),
     card(
+      #TODO add an info/help tooltip explaining how this is calculated
       full_screen = TRUE,
       plotOutput("plot_et")
     ),
