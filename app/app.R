@@ -160,8 +160,8 @@ server <- function(input, output, session) {
   data_filtered_atm <- reactive({
     data_full |> 
       filter(site %in% input$site) |> 
-      filter(date(datetime) >= input$daterange[1],
-             date(datetime) <= input$daterange[2])
+      filter(date(datetime) >= input$daterange_atm[1],
+             date(datetime) <= input$daterange_atm[2])
   })
   data_filtered_soil <- reactive({
     data_full |> 
