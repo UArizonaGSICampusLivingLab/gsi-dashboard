@@ -96,7 +96,7 @@ ui <- page_navbar(
         value = c(Sys.Date() - 7, Sys.Date()),
         dateFormat = "MM/dd/yy",
         maxDate = Sys.Date(),
-        minDate = "2024-01-06",
+        minDate = "2023-06-05",
         addon = "none",
         update_on = "close"
       )
