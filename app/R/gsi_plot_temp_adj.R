@@ -15,7 +15,7 @@ gsi_plot_temp_adj <- function(data) {
   #Plot up or down triangle if adjusted temp is hotter or colder than real temp
   p_base <- 
     ggplot(plot_df, aes(x = datetime, color = site)) +
-    geom_line(aes(y = air_temperature.value), alpha = 0.5, linewidth = 1) + 
+    geom_line(aes(y = air_temperature.value), alpha = 0.75, linewidth = 1) + 
     
     ## another option is to just plot shapes instead of arrows
     # geom_point(aes(shape = adjustment, y = air_temperature_adj.value, fill = site),
@@ -31,6 +31,7 @@ gsi_plot_temp_adj <- function(data) {
     p_base +
       geom_segment(aes(y = air_temperature.value, yend = temp_adj, xend = datetime),
                    arrow = arrow(length = unit(0.07, "inches"), type = "closed"), 
+                   linewidth = 0.75,
                    alpha = 0.5) 
   } else {
     p_base
