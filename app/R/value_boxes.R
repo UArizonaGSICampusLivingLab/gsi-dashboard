@@ -105,3 +105,32 @@ make_value_lastrain <- function(data_full) {
 
 # make_value_lastrain(data_full)
 
+make_value_feelslike <- function(data_full) {
+  #summarize data
+  df <- data_full |> 
+    mutate(site = if_else(site == "Physics and Atmospheric Sciences", "Phys & Atm Sci", site)) |> 
+    group_by(site) |> 
+    select(site, datetime, air_temperature.value, air_temperature_adj.value) |> 
+    filter(!is.na(air_temperature_adj.value)) |> 
+    filter(datetime == max(datetime)) |> 
+    slice(1) |> 
+    ungroup() |> 
+    select(-datetime)
+    
+  df <- df |> 
+    mutate(emoji = case_when(
+      air_temperature_adj.value > air_temperature.value ~ "🥵",
+      air_temperature_adj.value < air_temperature.value ~ "🥶",
+      .default = ""
+    )) |> 
+    mutate(air_temperature_adj.value = glue("{emoji} {air_temperature_adj.value}ºC")) |> 
+    select(site, air_temperature_adj.value)
+  
+  value_box(
+    title = glue::glue('"Feels Like" Temperature'), 
+    showcase = bs_icon("person"),
+    value = markdown(knitr::kable(df, col.names = c("", ""), format = "pipe")),
+    fill = FALSE
+  )
+  }
+# make_value_feelslike(data_full)

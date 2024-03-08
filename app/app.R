@@ -102,8 +102,8 @@ ui <- page_navbar(
       heights_equal = "all",
       fill = FALSE,
       make_value_latest(data_full),
-      make_value_precip(data_full),
-      make_value_test(),
+      make_value_feelslike(data_full),
+      make_value_precip(data_full)
     ),
     card(
       includeMarkdown("about.md"),
