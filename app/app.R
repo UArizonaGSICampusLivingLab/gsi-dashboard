@@ -31,7 +31,15 @@ theme <- bs_theme(preset = "shiny")
 
 # UI ----------------------------------------------------------------------
 ui <- page_navbar(
-  theme = bs_theme_update(theme, primary = "#81D3EB", font_scale = 1.2),
+  theme = bs_theme_update(
+    theme,
+    primary = "#81D3EB",
+    font_scale = 1.1,
+    # Make everything a little tighter together
+    `card-cap-padding-y` = "0.2rem", #padding around contents of card_header()
+    `card-spacer-y` = "0.5rem", #padding around contents of card
+    spacer = "0.7rem" #spacing between cards
+  ),
   title = "GSI Living Lab", 
   id = "navbar",
   # fillable = FALSE, # make scrollable.  Try with and without this
@@ -138,18 +146,40 @@ ui <- page_navbar(
     "Environmental",
     htmlOutput("legend3"),
     card(
-      #TODO add an info/help tooltip explaining what this is
       full_screen = TRUE,
+      card_header(
+        "Adjusted temperature",
+        #extra info in popover button
+        popover(
+          actionLink("link", label = bs_icon("question-circle")),
+            "Lines indicate dry-bulb temperature and arrows pointing up or down from lines indicate either wind chill or heat index temperatures."
+        ),
+        class = "d-flex justify-content-between" #moves icon to right
+      ),
       plotOutput("plot_temp_adj")
     ),
     card(
-      #TODO add an info/help tooltip explaining how this is calculated
       full_screen = TRUE,
+      card_header(
+        "Plant Available Water",
+        popover(
+          actionLink("link", label = bs_icon("question-circle")),
+          "Plant available water calculated using the ____ method."
+        ),
+        class = "d-flex justify-content-between" #moves icon to right
+      ),
       plotOutput("plot_paw")
     ),
     card(
-      #TODO add an info/help tooltip explaining how this is calculated
       full_screen = TRUE,
+      card_header(
+        "Potential Evapotranspiration",
+        popover(
+          actionLink("link", label = bs_icon("question-circle")),
+          "Calculated using the Penman-Monteith method"
+        ),
+        class = "d-flex justify-content-between" #moves icon to right
+      ),
       plotOutput("plot_et")
     ),
   )
