@@ -22,5 +22,5 @@ gsi_plot_paw <- function(data) {
     scale_y_continuous(labels = scales::label_percent(scale = 1)) +
     scale_color_manual(values = gsi_site_colors, aesthetics = c("fill", "color")) + #defined in 0-theme_gsi.R
     guides(color = "none", fill = "none") +
-    theme(axis.title.x = element_blank())
+    theme(axis.title.x = element_blank(), axis.text.x = element_text(angle = 45, hjust = 1))
 }
