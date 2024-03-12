@@ -8,7 +8,7 @@ library(ggplot2)
 gsi_plot_soil <- function(data, yvar) {
   plot_data <- data |> 
     mutate(month_str = lubridate::month(datetime, label = TRUE), month_num = lubridate::month(datetime)) |>
-    # recode depth
+    # recode depth to make number positive and add "m", e.g. "0.5m"
     mutate(depth = paste(-depth_height_m, "m")) |> 
     filter(!is.na(.data[[yvar]])) 
   

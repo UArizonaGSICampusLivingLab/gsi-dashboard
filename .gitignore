@@ -21,6 +21,8 @@ vignettes/*.pdf
 
 # OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
 .httr-oauth
+~/.boxr-oauth
+
 # knitr and R markdown default cache directories
 *_cache/
 /cache/
@@ -42,8 +44,11 @@ rsconnect/
 # large data
 data/gsi_living_lab_data.csv
 app/data/gsi_living_lab_data.csv
+data/gsi_living_lab_ETo.csv
 app/data/gsi_living_lab_ETo.csv
-~/.boxr-oauth
+app/data/gsi_living_lab_ETo.csv
+
+
 
 
 # rendered outputs

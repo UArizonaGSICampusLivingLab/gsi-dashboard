@@ -10,24 +10,36 @@ library(boxr)
 library(glue)
 library(Hmisc)
 
-# Read in metadata
-site_info <- read_csv("data/site_info.csv")
-
 # Download most recent data from Box
 box_auth_service(token_text = Sys.getenv("BOX_TOKEN_TEXT"))
 gsi_get_data()
+
+# Read in metadata
+site_info <- read_csv("data/site_info.csv")
 
 # Read in data and join with site info
 data_full <- 
   read_csv("data/gsi_living_lab_data.csv") |> 
   right_join(site_info) |> 
   mutate(datetime = with_tz(datetime, "America/Phoenix"))
-# legend <- make_legend(unique(data_full$site))
+
+data_et <-
+  read_csv("data/gsi_living_lab_ETo.csv") |> 
+  left_join(site_info)
+
 theme <- bs_theme(preset = "shiny")
 
 # UI ----------------------------------------------------------------------
 ui <- page_navbar(
-  theme = bs_theme_update(theme, primary = "#81D3EB", font_scale = 1.2),
+  theme = bs_theme_update(
+    theme,
+    primary = "#81D3EB",
+    font_scale = 1.1,
+    # Make everything a little tighter together
+    `card-cap-padding-y` = "0.2rem", #padding around contents of card_header()
+    `card-spacer-y` = "0.5rem", #padding around contents of card
+    spacer = "0.7rem" #spacing between cards
+  ),
   title = "GSI Living Lab", 
   id = "navbar",
   # fillable = FALSE, # make scrollable.  Try with and without this
@@ -45,7 +57,7 @@ ui <- page_navbar(
     conditionalPanel(
       "input.navbar == 'Atmospheric'",
       airDatepickerInput(
-        inputId = "daterange",
+        inputId = "daterange_atm",
         label = "Date Range",
         range = TRUE,
         # Default date range
@@ -78,6 +90,21 @@ ui <- page_navbar(
         minDate = "2023-06-05",
         view = "months",
         minView = "months",
+        addon = "none",
+        update_on = "close"
+      )
+    ),
+    conditionalPanel(
+      "input.navbar == 'Environmental'",
+      airDatepickerInput(
+        inputId = "daterange_env",
+        label = "Date Range",
+        range = TRUE,
+        # Default date range
+        value = c(Sys.Date() - 7, Sys.Date()),
+        dateFormat = "MM/dd/yy",
+        maxDate = Sys.Date(),
+        minDate = "2023-06-05",
         addon = "none",
         update_on = "close"
       )
@@ -116,20 +143,46 @@ ui <- page_navbar(
     )
   ),
   nav_panel(
-    "Environmental Plots",
+    "Environmental",
     htmlOutput("legend3"),
-  ),
-  
-  # nav_panel(
-  #   "value box demo", 
-  #   #TODO: try putting these in sidebar
-  #   layout_columns(
-  #     height = "20%",
-  #     uiOutput("stat_airtemp"),
-  #     uiOutput("stat_soiltemp"),
-  #     uiOutput("stat_precip")
-  #   )
-  # ),
+    card(
+      full_screen = TRUE,
+      card_header(
+        "Adjusted temperature",
+        #extra info in popover button
+        popover(
+          actionLink("link", label = bs_icon("question-circle")),
+            "Lines indicate dry-bulb temperature and arrows pointing up or down from lines indicate either wind chill or heat index temperatures."
+        ),
+        class = "d-flex justify-content-between" #moves icon to right
+      ),
+      plotOutput("plot_temp_adj")
+    ),
+    card(
+      full_screen = TRUE,
+      card_header(
+        "Plant Available Water",
+        popover(
+          actionLink("link", label = bs_icon("question-circle")),
+          "Plant available water calculated using the ____ method."
+        ),
+        class = "d-flex justify-content-between" #moves icon to right
+      ),
+      plotOutput("plot_paw")
+    ),
+    card(
+      full_screen = TRUE,
+      card_header(
+        "Potential Evapotranspiration",
+        popover(
+          actionLink("link", label = bs_icon("question-circle")),
+          markdown("Calculated using the [Penman-Monteith](https://en.wikipedia.org/wiki/Penman–Monteith_equation) method")
+        ),
+        class = "d-flex justify-content-between" #moves icon to right
+      ),
+      plotOutput("plot_et")
+    ),
+  )
 )
 
 
@@ -140,8 +193,8 @@ server <- function(input, output, session) {
   data_filtered_atm <- reactive({
     data_full |> 
       filter(site %in% input$site) |> 
-      filter(date(datetime) >= input$daterange[1],
-             date(datetime) <= input$daterange[2])
+      filter(date(datetime) >= input$daterange_atm[1],
+             date(datetime) <= input$daterange_atm[2])
   })
   data_filtered_soil <- reactive({
     data_full |> 
@@ -149,6 +202,19 @@ server <- function(input, output, session) {
       filter(date(datetime) >= input$monthrange[1],
              date(datetime) <= input$monthrange[2])
   })
+  data_filtered_env <- reactive({
+    data_full |> 
+      filter(site %in% input$site) |> 
+      filter(date(datetime) >= input$daterange_env[1], 
+             date(datetime) <= input$daterange_env[2])
+  })
+  data_filtered_et <- reactive({
+    data_et |> 
+      filter(site %in% input$site) |> 
+      filter(date(datetime) >= input$daterange_env[1], 
+             date(datetime) <= input$daterange_env[2])
+  })
+  
   ## Legend -------
   #can't re-use output objects, so make one for each tab
   output$legend1 <- output$legend2 <- output$legend3 <- renderUI({
@@ -183,63 +249,17 @@ server <- function(input, output, session) {
       labs(y = "Matric Potential (kPa)")
   })
   
-  ##  Value boxes -------
-  # output$stat_airtemp <- renderUI({
-  #   airtemp <- data_filtered()$air_temperature.value
-  #   
-  #   airtemp_vals <- 
-  #     c(
-  #       max(airtemp, na.rm = TRUE),
-  #       mean(airtemp, na.rm = TRUE),
-  #       min(airtemp, na.rm = TRUE)
-  #     ) |> 
-  #     round(2)
-  #   
-  #   value_box(
-  #     title = "Air Temperature",
-  #     value =  HTML(glue("
-  #          H: {airtemp_vals[1]} ºC<br>
-  #          M: {airtemp_vals[2]} ºC<br>
-  #          L: {airtemp_vals[3]} ºC
-  #          ")),
-  #     showcase = bs_icon("thermometer")
-  #   )
-  # })
-  # 
-  # output$stat_soiltemp <- renderUI({
-  #   soiltemp <- data_filtered()$soil_temperature.value
-  #   soiltemp_vals <- 
-  #     c(
-  #       max(soiltemp, na.rm = TRUE),
-  #       mean(soiltemp, na.rm = TRUE),
-  #       min(soiltemp, na.rm = TRUE)
-  #     ) |> 
-  #     round(2)
-  #   value_box(
-  #     title = "Soil Temperature",
-  #     value =  HTML(glue("
-  #          H: {soiltemp_vals[1]} ºC<br>
-  #          M: {soiltemp_vals[2]} ºC<br>
-  #          L: {soiltemp_vals[3]} ºC
-  #          ")),
-  #     showcase = bs_icon("thermometer")
-  #   )
-  # })
-  # 
-  # output$stat_precip<- renderUI({
-  #   
-  #   precip_total <- 
-  #     data_filtered()$precipitation.value |> 
-  #     sum(na.rm = TRUE) |> 
-  #     round(1)
-  #   
-  #   value_box(
-  #     title = "Total Precipitation",
-  #     #TODO: check that units are correct
-  #     value = paste(precip_total, "mm"),
-  #     showcase = bs_icon("cloud-rain")
-  #   )
-  # })
+  output$plot_et <- renderPlot({
+    gsi_plot_et(data_filtered_et())
+  })
+  
+  output$plot_paw <- renderPlot({
+    gsi_plot_paw(data_filtered_env())
+  })
+  
+  output$plot_temp_adj <- renderPlot({
+    gsi_plot_temp_adj(data_filtered_env())
+  })
 }
 
 shinyApp(ui, server)
