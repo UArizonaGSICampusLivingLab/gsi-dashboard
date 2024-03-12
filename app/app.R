@@ -176,7 +176,7 @@ ui <- page_navbar(
         "Potential Evapotranspiration",
         popover(
           actionLink("link", label = bs_icon("question-circle")),
-          "Calculated using the Penman-Monteith method"
+          markdown("Calculated using the [Penman-Monteith](https://en.wikipedia.org/wiki/Penman–Monteith_equation) method")
         ),
         class = "d-flex justify-content-between" #moves icon to right
       ),
