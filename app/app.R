@@ -15,38 +15,37 @@ library(markdown)
 # Create theme
 theme <- bs_theme(preset = "shiny")
 
-# Read in metadata
-site_info <- read_csv("data/site_info.csv")
-
-# # Download most recent data from Box
+# Download most recent data from Box
 box_auth_service(token_text = Sys.getenv("BOX_TOKEN_TEXT"))
 gsi_get_data()
+
+# Read in metadata
+site_info <- read_csv("data/site_info.csv")
 
 # Read in data and join with site info
 data_full <- 
   read_csv("data/gsi_living_lab_data.csv") |> 
   right_join(site_info) |> 
   mutate(datetime = with_tz(datetime, "America/Phoenix")) |>
-  group_by(site, basin, depth_height_m) |>
-  
-  # summarize(by = c(site, basin, depth_height_m))
-  mutate(
-    om_avg_moisture = mean(water_content.value, na.rm = TRUE),
-    pas_avg_moisture = mean(water_content.value, na.rm = TRUE),
-    gs_avg_moisture = mean(water_content.value, na.rm = TRUE)
-  )|>
-  mutate(
-    paw_om = ((om_avg_moisture-0.06)/0.11)*100,
-    paw_pas = ((pas_avg_moisture-0.06)/0.11)*100,
-    paw_gs = ((gs_avg_moisture-0.06)/0.11)*100
-  )
-  
+  group_by(site, basin, depth_height_m) 
+
+data_et <-
+  read_csv("data/gsi_living_lab_ETo.csv") |> 
+  left_join(site_info)
 
 
 # UI ----------------------------------------------------------------------
 ui <- page_navbar(
   includeCSS("custom.css"),
-  theme = bs_theme_update(theme, primary = "#81D3EB", font_scale = 1.2),
+  theme = bs_theme_update(
+    theme,
+    primary = "#81D3EB",
+    font_scale = 1.1,
+    # Make everything a little tighter together
+    `card-cap-padding-y` = "0.2rem", #padding around contents of card_header()
+    `card-spacer-y` = "0.5rem", #padding around contents of card
+    spacer = "0.7rem" #spacing between cards
+  ),
   title = "GSI Living Lab", 
   id = "navbar",
   # fillable = FALSE, # make scrollable.  Try with and without this
@@ -66,7 +65,7 @@ ui <- page_navbar(
     conditionalPanel(
       "input.navbar == 'Atmospheric'",
       airDatepickerInput(
-        inputId = "daterange",
+        inputId = "daterange_atm",
         label = "Date Range",
         range = TRUE,
         # Default date range
@@ -79,7 +78,11 @@ ui <- page_navbar(
       ),
       conditionalPanel(
         "input.navbar == 'Atmospheric'",
-        input_switch("daily", "Daily Summary")
+        input_switch("daily", span(
+          "Daily",
+          tooltip(bs_icon("info-circle"),
+                  "Display temperature and RH are as mean ± range and precipitaiton as daily totals.")
+        ))
       )
     ),
     conditionalPanel(
@@ -95,6 +98,21 @@ ui <- page_navbar(
         minDate = "2023-06-05",
         view = "months",
         minView = "months",
+        addon = "none",
+        update_on = "close"
+      )
+    ),
+    conditionalPanel(
+      "input.navbar == 'Environmental'",
+      airDatepickerInput(
+        inputId = "daterange_env",
+        label = "Date Range",
+        range = TRUE,
+        # Default date range
+        value = c(Sys.Date() - 7, Sys.Date()),
+        dateFormat = "MM/dd/yy",
+        maxDate = Sys.Date(),
+        minDate = "2023-06-05",
         addon = "none",
         update_on = "close"
       )
@@ -137,7 +155,7 @@ ui <- page_navbar(
     ),
     card(
       full_screen = TRUE,
-      plotOutput("plot_vp")
+      plotOutput("plot_rh")
     )
   ),
   nav_panel(
@@ -157,8 +175,45 @@ ui <- page_navbar(
     )
   ),
   nav_panel(
-    "Environmental Plots",
+    "Environmental",
     htmlOutput("legend3"),
+    card(
+      full_screen = TRUE,
+      card_header(
+        "Adjusted temperature",
+        #extra info in popover button
+        popover(
+          actionLink("link", label = bs_icon("question-circle")),
+            "Lines indicate dry-bulb temperature and arrows pointing up or down from lines indicate either wind chill or heat index temperatures."
+        ),
+        class = "d-flex justify-content-between" #moves icon to right
+      ),
+      plotOutput("plot_temp_adj")
+    ),
+    card(
+      full_screen = TRUE,
+      card_header(
+        "Plant Available Water",
+        popover(
+          actionLink("link", label = bs_icon("question-circle")),
+          "Plant available water calculated using the ____ method."
+        ),
+        class = "d-flex justify-content-between" #moves icon to right
+      ),
+      plotOutput("plot_paw")
+    ),
+    card(
+      full_screen = TRUE,
+      card_header(
+        "Potential Evapotranspiration",
+        popover(
+          actionLink("link", label = bs_icon("question-circle")),
+          markdown("Calculated using the [Penman-Monteith](https://en.wikipedia.org/wiki/Penman–Monteith_equation) method")
+        ),
+        class = "d-flex justify-content-between" #moves icon to right
+      ),
+      plotOutput("plot_et")
+    ),
   )
 )
 
@@ -185,14 +240,28 @@ server <- function(input, output, session) {
   data_filtered_atm <- reactive({
     data_full |> 
       filter(site %in% input$site) |> 
-      filter(datetime >= input$daterange[1], datetime <= input$daterange[2])
+      filter(date(datetime) >= input$daterange_atm[1],
+             date(datetime) <= input$daterange_atm[2])
   })
   data_filtered_soil <- reactive({
     data_full |> 
       filter(site %in% input$site) |> 
-      filter(datetime >= input$monthrange[1], datetime <= input$monthrange[2])
+      filter(date(datetime) >= input$monthrange[1],
+             date(datetime) <= input$monthrange[2])
   })
-  
+  data_filtered_env <- reactive({
+    data_full |> 
+      filter(site %in% input$site) |> 
+      filter(date(datetime) >= input$daterange_env[1], 
+             date(datetime) <= input$daterange_env[2])
+  })
+  data_filtered_et <- reactive({
+    data_et |> 
+      filter(site %in% input$site) |> 
+      filter(date(datetime) >= input$daterange_env[1], 
+             date(datetime) <= input$daterange_env[2])
+  })
+
   ## Legend -------
   #can't re-use output objects, so make one for each tab
   output$legend1 <- output$legend2 <- output$legend3 <- renderUI({
@@ -208,8 +277,8 @@ server <- function(input, output, session) {
     gsi_plot_precip(data_filtered_atm(), daily = input$daily)
   })
   
-  output$plot_vp <- renderPlot({
-    gsi_plot_vpd(data_filtered_atm(), daily = input$daily)
+  output$plot_rh <- renderPlot({
+    gsi_plot_rh(data_filtered_atm(), daily = input$daily)
   })
   
   output$plot_soil_temp <- renderPlot({
@@ -225,6 +294,18 @@ server <- function(input, output, session) {
   output$plot_soil_matric <- renderPlot({
     gsi_plot_soil(data_filtered_soil(), yvar = "matric_potential.value") +
       labs(y = "Matric Potential (kPa)")
+  })
+  
+  output$plot_et <- renderPlot({
+    gsi_plot_et(data_filtered_et())
+  })
+  
+  output$plot_paw <- renderPlot({
+    gsi_plot_paw(data_filtered_env())
+  })
+  
+  output$plot_temp_adj <- renderPlot({
+    gsi_plot_temp_adj(data_filtered_env())
   })
 }
 
