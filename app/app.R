@@ -9,6 +9,11 @@ library(tidyverse)
 library(boxr)
 library(glue)
 library(Hmisc)
+library(knitr)
+library(markdown)
+
+# Create theme
+theme <- bs_theme(preset = "shiny")
 
 # Download most recent data from Box
 box_auth_service(token_text = Sys.getenv("BOX_TOKEN_TEXT"))
@@ -21,16 +26,17 @@ site_info <- read_csv("data/site_info.csv")
 data_full <- 
   read_csv("data/gsi_living_lab_data.csv") |> 
   right_join(site_info) |> 
-  mutate(datetime = with_tz(datetime, "America/Phoenix"))
+  mutate(datetime = with_tz(datetime, "America/Phoenix")) |>
+  group_by(site, basin, depth_height_m) 
 
 data_et <-
   read_csv("data/gsi_living_lab_ETo.csv") |> 
   left_join(site_info)
 
-theme <- bs_theme(preset = "shiny")
 
 # UI ----------------------------------------------------------------------
 ui <- page_navbar(
+  includeCSS("custom.css"),
   theme = bs_theme_update(
     theme,
     primary = "#81D3EB",
@@ -44,6 +50,8 @@ ui <- page_navbar(
   id = "navbar",
   # fillable = FALSE, # make scrollable.  Try with and without this
   sidebar = sidebar(
+    id = "sidebar",
+    open = FALSE, #sidebar initially closed on landing page
     # This could be a value_box instead of just plain text
     paste("Data last updated ", 
           format(max(data_full$datetime, na.rm = TRUE),
@@ -108,6 +116,30 @@ ui <- page_navbar(
         addon = "none",
         update_on = "close"
       )
+    )
+  ),
+  nav_panel(
+    "About",
+    div(
+      img(src = "bannerimage.png", align = "center", style = "width: 100%"),
+      div(
+        h2("Campus Living Lab"),
+        h3("Green Stormwater Infrastructure"),
+        class = "centered"
+      ),
+      class = "container"
+    ),
+    layout_column_wrap(
+      width = 1/3,
+      heights_equal = "all",
+      fill = FALSE,
+      make_value_latest(data_full),
+      make_value_feelslike(data_full),
+      make_value_precip(data_full)
+    ),
+    card(
+      includeMarkdown("about.md"),
+      fill = FALSE #change this to TRUE to have the row of value boxes "frozen" to the top
     )
   ),
   nav_panel(
@@ -189,7 +221,22 @@ ui <- page_navbar(
 # Server ------------------------------------------------------------------
 
 server <- function(input, output, session) {
-  #bs_themer() #temporary! Remove before deploying
+  # bs_themer() #temporary! Remove before deploying
+
+
+  ## Open sidebar on other tabs --------------------------------------------
+  
+  # sidebar starts hidden, but this opens it when you switch to any tab other
+  # than "About"
+  observe({
+    sidebar_toggle(
+      id = "sidebar",
+      open = input$navbar != "About"
+    )
+  })  
+  
+  
+  ## Get filtered data -----------------------------------------------------
   data_filtered_atm <- reactive({
     data_full |> 
       filter(site %in% input$site) |> 
@@ -214,7 +261,7 @@ server <- function(input, output, session) {
       filter(date(datetime) >= input$daterange_env[1], 
              date(datetime) <= input$daterange_env[2])
   })
-  
+
   ## Legend -------
   #can't re-use output objects, so make one for each tab
   output$legend1 <- output$legend2 <- output$legend3 <- renderUI({
