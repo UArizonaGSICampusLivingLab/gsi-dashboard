@@ -19,14 +19,28 @@ theme <- bs_theme(preset = "shiny")
 site_info <- read_csv("data/site_info.csv")
 
 # # Download most recent data from Box
-# box_auth_service(token_text = Sys.getenv("BOX_TOKEN_TEXT"))
-# gsi_get_data()
+box_auth_service(token_text = Sys.getenv("BOX_TOKEN_TEXT"))
+gsi_get_data()
 
 # Read in data and join with site info
 data_full <- 
   read_csv("data/gsi_living_lab_data.csv") |> 
   right_join(site_info) |> 
-  mutate(datetime = with_tz(datetime, "America/Phoenix"))
+  mutate(datetime = with_tz(datetime, "America/Phoenix")) |>
+  group_by(site, basin, depth_height_m) |>
+  
+  # summarize(by = c(site, basin, depth_height_m))
+  mutate(
+    om_avg_moisture = mean(water_content.value, na.rm = TRUE),
+    pas_avg_moisture = mean(water_content.value, na.rm = TRUE),
+    gs_avg_moisture = mean(water_content.value, na.rm = TRUE)
+  )|>
+  mutate(
+    paw_om = ((om_avg_moisture-0.06)/0.11)*100,
+    paw_pas = ((pas_avg_moisture-0.06)/0.11)*100,
+    paw_gs = ((gs_avg_moisture-0.06)/0.11)*100
+  )
+  
 
 
 # UI ----------------------------------------------------------------------
@@ -89,7 +103,7 @@ ui <- page_navbar(
   nav_panel(
     "About",
     div(
-      img(src = "testimage.png", align = "center", style = "width: 100%"),
+      img(src = "bannerimage.png", align = "center", style = "width: 100%"),
       div(
         h2("Campus Living Lab"),
         h3("Green Stormwater Infrastructure"),
