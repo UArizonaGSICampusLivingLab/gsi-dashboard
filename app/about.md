@@ -29,8 +29,16 @@ In the Soil tab you'll find figures for soil properties at two depths:
 
 In the Environmental Plots tab you'll find figures for:
 
--   EvapoTranspiration
+-   Evapotranspiration
+
+    -   This is calculated daily using the [Penman-Monteith](https://en.wikipedia.org/wiki/Penman--Monteith_equation) method"
+
 -   Plant Available Water
+
+    -   Uses the equation from [Metergroup](https://metergroup.com/measurement-insights/how-to%5D(https://metergroup.com/measurement-insights/how-to-)%20model-plant-available-water/) with estimated values for field capacity and plant wilting point from sandy-loam soil texture.
+
 -   Perceived Temperature
+
+    -   This is calculated from National Weather Service [wind chill](https://www.weather.gov/media/epz/wxcalc/windChill.pdf) or [heat index](https://www.wpc.ncep.noaa.gov/html/heatindex_equation.shtml) equations.
 
 ![Photo Credit: Ryan Hunt, BIO5 Institute](CampusLivingLab-0386.jpg){style="display:block;margin:0 auto" width="665"}

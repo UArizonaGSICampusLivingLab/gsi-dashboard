@@ -196,7 +196,7 @@ ui <- page_navbar(
         "Plant Available Water",
         popover(
           actionLink("link", label = bs_icon("question-circle")),
-          "Plant available water calculated using the ____ method."
+          markdown("Plant available water is calculated using estimates for sandy loam soil. [PAW](https://metergroup.com/measurement-insights/how-to-model-plant-available-water/) ")
         ),
         class = "d-flex justify-content-between" #moves icon to right
       ),

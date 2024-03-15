@@ -111,7 +111,7 @@ make_value_feelslike <- function(data_full) {
     mutate(site = if_else(site == "Physics and Atmospheric Sciences", "Phys & Atm Sci", site)) |> 
     group_by(site) |> 
     select(site, datetime, air_temperature.value, air_temperature_adj.value) |> 
-    filter(!is.na(air_temperature_adj.value)) |> 
+    filter(!is.na(air_temperature_adj.value)) |>
     filter(datetime == max(datetime)) |> 
     slice(1) |> 
     ungroup() |> 
@@ -129,7 +129,7 @@ make_value_feelslike <- function(data_full) {
   value_box(
     title = glue::glue('"Feels Like" Temperature'), 
     showcase = bs_icon("person"),
-    value = markdown(knitr::kable(df, col.names = c("", ""), format = "pipe")),
+    value = markdown(knitr::kable(df, col.names = c("", "🌡"), format = "pipe")),
     fill = FALSE
   )
   }
