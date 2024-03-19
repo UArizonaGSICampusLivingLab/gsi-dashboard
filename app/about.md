@@ -19,7 +19,7 @@ In the Atmosphere tab you'll find figures for:
 
 -   Air Temperature
 -   Precipitation
--   Vapor pressure
+-   Percent Relative Humidity
 
 In the Soil tab you'll find figures for soil properties at two depths:
 
