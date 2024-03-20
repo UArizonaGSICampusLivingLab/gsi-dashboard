@@ -26,8 +26,7 @@ site_info <- read_csv("data/site_info.csv")
 data_full <- 
   read_csv("data/gsi_living_lab_data.csv") |> 
   right_join(site_info) |> 
-  mutate(datetime = with_tz(datetime, "America/Phoenix")) |>
-  group_by(site, basin, depth_height_m) 
+  mutate(datetime = with_tz(datetime, "America/Phoenix")) 
 
 data_et <-
   read_csv("data/gsi_living_lab_ETo.csv") |> 
