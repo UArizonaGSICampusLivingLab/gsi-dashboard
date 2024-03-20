@@ -29,7 +29,7 @@ gsi_plot_rh <- function(data, daily = FALSE) {
   } else {
     p <- 
       ggplot(data_atm, aes(x = datetime, color = site)) +
-      geom_line(aes(y = relative_humidity.value), linewidth = 1, alpha = 0.75, na.rm = TRUE)
+      geom_line(aes(y = relative_humidity.value), linewidth = 1.5, alpha = 0.75, na.rm = TRUE)
     
   }
   
