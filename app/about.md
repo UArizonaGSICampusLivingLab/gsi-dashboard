@@ -11,7 +11,7 @@ This innovative campus initiative was designed to transform our green stormwater
 
 ### Chase the Rain {style="text-align: center;"}
 
-Visit our three sites on campus: Old Main, Gould Simpson, and Physics and Atmospheric Sciences. These sites represent various green stormwater infrastructure designs to capture and water plants. Old Main represents a native xeroscape rain garden with the primary water source being rooftop runoff. Gould Simpson is a Resilience Garden sponsored by the University of Arizona Arboretum featuring legume trees that receives water from two rooftops and surrounding hardscapes. Physics and Atmospheric Sciences features a classic southwest landscape slight grading for stormwater collection and desert vegetation. For more information, visit the [Campus Living Lab](http://gicampuslivinglab.arizona.edu/) website.
+Visit our three sites on campus: Old Main, Gould Simpson, and Physics and Atmospheric Sciences. These sites represent various green stormwater infrastructure designs to capture and water plants. Old Main represents a native xeroscape rain garden with the primary water source being rooftop runoff. Gould Simpson is a Resilience Garden sponsored by the University of Arizona Arboretum featuring legume trees that receives water from two rooftops and surrounding hardscapes. Physics and Atmospheric Sciences features a classic southwest landscape, slight grading for stormwater collection, and desert vegetation. For more information, visit the [Campus Living Lab](http://gicampuslivinglab.arizona.edu/) website.
 
 ### Go With the Flow {style="text-align: center;"}
 
