@@ -18,7 +18,7 @@ jobs:
     env:
       APP_NAME: "gsi-dashboard" 
       APP_DIR: "app"
-      ACCESS_TYPE: "acl" #options are "all", "logged_in", or "acl"
+      ACCESS_TYPE: "all" #options are "all", "logged_in", or "acl"
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }} #Not sure if this is necessary
     steps:
       - uses: actions/checkout@v4
