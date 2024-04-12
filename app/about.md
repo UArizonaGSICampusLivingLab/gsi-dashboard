@@ -36,3 +36,6 @@ In the Environmental Plots tab you'll find figures for:
 -   Perceived Temperature: The human perceived temperature, which is closely linked to air temperature
 
 ![Photo Credit: Ryan Hunt, BIO5 Institute](CampusLivingLab-0386.jpg){style="display:block;margin:0 auto" width="665"}
+
+------------------------------------------------------------------------
+Developed in collaboration with the University of Arizona [CCT Data Science](https://datascience.cct.arizona.edu/) team
