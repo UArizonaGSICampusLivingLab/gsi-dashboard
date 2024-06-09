@@ -42,3 +42,5 @@ In the Environmental Plots tab you'll find figures for:
     -   This is calculated from National Weather Service [wind chill](https://www.weather.gov/media/epz/wxcalc/windChill.pdf) or [heat index](https://www.wpc.ncep.noaa.gov/html/heatindex_equation.shtml) equations.
 
 ![Photo Credit: Ryan Hunt, BIO5 Institute](CampusLivingLab-0386.jpg){style="display:block;margin:0 auto" width="665"}
+
+This app was developed in collaboration with the University of Arizona CCT Data Science Team [CCT Data Science Team](https://datascience.cct.arizona.edu/) 
