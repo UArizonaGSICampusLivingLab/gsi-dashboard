@@ -16,8 +16,8 @@ library(markdown)
 theme <- bs_theme(preset = "shiny")
 
 # Download most recent data from Box
-box_auth_service(token_text = Sys.getenv("BOX_TOKEN_TEXT"))
-gsi_get_data()
+##box_auth_service(token_text = Sys.getenv("BOX_TOKEN_TEXT"))
+##gsi_get_data()
 
 # Read in metadata
 site_info <- read_csv("data/site_info.csv")
@@ -159,6 +159,7 @@ ui <- page_navbar(
   ),
   nav_panel(
     "Soil",
+    p("Note: All soil graphs display connected monthly averges of data in order of month, no matter the year. Selecting March 2023 - January 2024 displays Jan 2024 data first on the plot, then connects it to March 2023 data to show yearly trends. "),
     htmlOutput("legend2"),
     card(
       full_screen = TRUE,
