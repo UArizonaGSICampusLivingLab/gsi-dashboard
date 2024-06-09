@@ -16,8 +16,8 @@ library(markdown)
 theme <- bs_theme(preset = "shiny")
 
 # Download most recent data from Box
-box_auth_service(token_text = Sys.getenv("BOX_TOKEN_TEXT"))
-gsi_get_data()
+# box_auth_service(token_text = Sys.getenv("BOX_TOKEN_TEXT"))
+# gsi_get_data()
 
 # Read in metadata
 site_info <- read_csv("data/site_info.csv")
@@ -139,8 +139,7 @@ ui <- page_navbar(
     card(
       includeMarkdown("about.md"),
       fill = FALSE #change this to TRUE to have the row of value boxes "frozen" to the top
-    ),
-    p("This app was developed in collaboration with the University of Arizona CCT Data Science Team. https://datascience.cct.arizona.edu/ "),
+    )
   ),
   nav_panel(
     "Atmospheric",
