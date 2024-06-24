@@ -64,3 +64,7 @@ If you use this code, please cite as follows:
 
 > Scott, E. R., Barrios, M. J., Riemer, K., & Buzzard, V. Campus Living Lab Green Stormwater Infrastructure Dashboard (Version 0.1.0) [Computer software].
 > <https://doi.org/10.5281/zenodo.10736077>
+
+------------------------------------------------------------------------
+
+Developed in collaboration with the University of Arizona [CCT Data Science](https://datascience.cct.arizona.edu/) team
