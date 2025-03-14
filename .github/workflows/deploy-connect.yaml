@@ -3,7 +3,7 @@
 # 2) https://rstudio.github.io/renv/articles/ci.html
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
-  workflow-dispatch:
+  workflow_dispatch:
   push:
     branches:
       - main #you may need to change this if your main branch has a different name
