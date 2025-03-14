@@ -1,4 +1,5 @@
-library(tidyverse)
+# library(tidyverse)
+library(ggplot2)
 library(ggtext)
 
 gsi_plot_et <- function(data_et) {
