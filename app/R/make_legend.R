@@ -6,6 +6,6 @@ make_legend <- function(sites) {
       HTML(paste(bs_icon("circle-fill", color = y), x))
     })
   
-  HTML(glue::glue_collapse(site_colors, sep = " | "))
+  p(HTML(glue::glue_collapse(site_colors, sep = " | ")))
 }
 # make_legend(sites)
