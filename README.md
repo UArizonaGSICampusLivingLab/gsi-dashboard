@@ -53,6 +53,10 @@ To learn more about Shiny and the `bslib` package (used to define the UI of the 
 The theme for all of the `ggplot2` plots in the dashboard is controlled by `R/0-theme_gsi.R`.
 (the filename starts with '0' because the files are sourced alphabetically and the theme is used by all the other functions in `R/`).
 
+### Notes
+
+Two sensors at the Old Main Location were plugged into incorrect ports upon installation. On December 11, 2024, these sensors switched logger ports. Plugs for port 3 and 5 were switched on the Old Main z6-19485 logger. This caused naming conventions to match the actual location of sensors. Note that this switch should be made in code when analyzing pre December 2024 data.
+
 ## Deployment
 
 This app is published to <https://viz.datascience.arizona.edu/gsi-dashboard/> automatically by a GitHub action whenever changes are made to the main branch of this repository.
